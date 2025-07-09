@@ -1,13 +1,13 @@
 # Visual Studio / C++
 
-# IDE‚Ìƒ†[ƒU[Ý’èƒtƒ@ƒCƒ‹ (ƒ`[ƒ€‚Å‹¤—L‚µ‚È‚¢)
+# IDEï¿½Ìƒï¿½ï¿½[ï¿½Uï¿½[ï¿½Ý’ï¿½tï¿½@ï¿½Cï¿½ï¿½ (ï¿½`ï¿½[ï¿½ï¿½ï¿½Å‹ï¿½ï¿½Lï¿½ï¿½ï¿½È‚ï¿½)
 *.suo
 *.user
 *.sln.docstates
 .vs/
 
-# ƒrƒ‹ƒhŒ‹‰Ê‚Æ’†ŠÔƒtƒ@ƒCƒ‹
-# ‚±‚ê‚ç‚ÍƒRƒ“ƒpƒCƒ‹‚·‚é‚½‚Ñ‚É¶¬‚³‚ê‚é‚½‚ßAƒŠƒ|ƒWƒgƒŠ‚ÉŠÜ‚ß‚È‚¢
+# ï¿½rï¿½ï¿½ï¿½hï¿½ï¿½ï¿½Ê‚Æ’ï¿½ï¿½Ôƒtï¿½@ï¿½Cï¿½ï¿½
+# ï¿½ï¿½ï¿½ï¿½ï¿½ÍƒRï¿½ï¿½ï¿½pï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½é‚½ï¿½Ñ‚Éï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½é‚½ï¿½ßAï¿½ï¿½ï¿½|ï¿½Wï¿½gï¿½ï¿½ï¿½ÉŠÜ‚ß‚È‚ï¿½
 [Dd]ebug/
 [Rr]elease/
 x64/
@@ -18,10 +18,10 @@ Win32/
 *.tlog
 *.ipch/
 
-# ¶¬‚³‚ê‚éŽÀsƒtƒ@ƒCƒ‹‚Æƒ‰ƒCƒuƒ‰ƒŠ
+# ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½sï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Æƒï¿½ï¿½Cï¿½uï¿½ï¿½ï¿½ï¿½
 *.exe
 *.lib
 *.dll
 
-# ‚»‚Ì‘¼
+# ï¿½ï¿½ï¿½Ì‘ï¿½
 Thumbs.db
