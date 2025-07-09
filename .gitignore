@@ -1,0 +1,27 @@
+# Visual Studio / C++
+
+# IDEのユーザー設定ファイル (チームで共有しない)
+*.suo
+*.user
+*.sln.docstates
+.vs/
+
+# ビルド結果と中間ファイル
+# これらはコンパイルするたびに生成されるため、リポジトリに含めない
+[Dd]ebug/
+[Rr]elease/
+x64/
+Win32/
+*.ilk
+*.pdb
+*.obj
+*.tlog
+*.ipch/
+
+# 生成される実行ファイルとライブラリ
+*.exe
+*.lib
+*.dll
+
+# その他
+Thumbs.db
