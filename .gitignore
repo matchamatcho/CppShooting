@@ -1,41 +1,27 @@
-# Prerequisites
-*.d
+# Visual Studio / C++
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# IDE�̃��[�U�[�ݒ�t�@�C�� (�`�[���ŋ��L���Ȃ�)
+*.suo
+*.user
+*.sln.docstates
+.vs/
 
-# Precompiled Headers
-*.gch
-*.pch
-
-# Linker files
+# �r���h���ʂƒ��ԃt�@�C��
+# �����̓R���p�C�����邽�тɐ�������邽�߁A���|�W�g���Ɋ܂߂Ȃ�
+[Dd]ebug/
+[Rr]elease/
+x64/
+Win32/
 *.ilk
-
-# Debugger Files
 *.pdb
+*.obj
+*.tlog
+*.ipch/
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
+# �����������s�t�@�C���ƃ��C�u����
+*.exe
+*.lib
 *.dll
 
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-
-# debug information files
-*.dwo
+# ���̑�
+Thumbs.db
