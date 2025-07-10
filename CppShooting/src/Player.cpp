@@ -8,8 +8,8 @@ Player::Player() :
     m_x(0.0f),
     m_y(-0.8f),
     m_fireCooldown(0.0f),
-    m_isAutoFireEnabled(false), // ★追加: 初期状態はオートファイアOFF
-    m_wasSpaceKeyPressed(false) // ★追加: 初期状態はキーが押されていない
+    m_isAutoFireEnabled(false),
+    m_wasSpaceKeyPressed(false)
 {
 }
 
@@ -26,13 +26,13 @@ void Player::Update(Bullet* bullets, int maxBullets)
     // 移動処理
     HandleMovement();
 
-    // ★変更: 射撃のトグル処理と、実際の射撃処理を分離
+    // 射撃のトグル処理と、実際の射撃処理を分離
     HandleFireToggle();
     HandleShooting(bullets, maxBullets);
 }
 
 /**
- * @brief キー入力に基づいてプレイヤーを移動させます。(変更なし)
+ * @brief キー入力に基づいてプレイヤーを移動させます。
  */
 void Player::HandleMovement()
 {
@@ -50,8 +50,7 @@ void Player::HandleMovement()
 }
 
 /**
- * @brief ★★★ここから追加★★★
- * キー入力に基づいてオートファイアの状態を切り替えます。
+ * @brief キー入力に基づいてオートファイアの状態を切り替えます。
  */
 void Player::HandleFireToggle()
 {
@@ -69,8 +68,7 @@ void Player::HandleFireToggle()
 
 
 /**
- * @brief ★★★ここから変更★★★
- * オートファイアが有効な場合に弾を発射します。
+ * @brief オートファイアが有効な場合に弾を発射します。
  */
 void Player::HandleShooting(Bullet* bullets, int maxBullets)
 {
@@ -79,23 +77,25 @@ void Player::HandleShooting(Bullet* bullets, int maxBullets)
     {
         m_fireCooldown = PLAYER_FIRE_COOLDOWN; // クールダウンをリセット
 
-        // 発射位置を定義 (プレイヤーの中心からの相対座標)
-        const float firePosX[] = { -0.1f, 0.0f,  0.1f };
-        const float firePosY[] = { 0.05f, 0.09f, 0.09f };
+        // 発射する弾の形状と、それぞれの発射位置オフセットを定義
+        BulletShape shapesToFire[] = { BulletShape::Square, BulletShape::Triangle, BulletShape::Pentagon };
+        float firePosX[] = { -0.1f, 0.0f, 0.1f }; // 四角、三角、五角の弾のX位置
+        float firePosY[] = { 0.06f, 0.1f, 0.06f }; // 四角、三角、五角の弾のY位置
+        int numBulletsToFire = 3;
 
         int bulletsFired = 0;
-
-        // 非アクティブな弾を探して3発同時に発射する
-        for (int i = 0; i < maxBullets; ++i)
+        // 非アクティブな弾を探して発射する
+        for (int i = 0; i < maxBullets && bulletsFired < numBulletsToFire; ++i)
         {
             if (!bullets[i].IsActive())
             {
-                bullets[i].Activate(m_x + firePosX[bulletsFired], m_y + firePosY[bulletsFired]);
-
+                // 形状と位置を指定して弾を有効化
+                bullets[i].Activate(
+                    m_x + firePosX[bulletsFired],
+                    m_y + firePosY[bulletsFired],
+                    shapesToFire[bulletsFired]
+                );
                 bulletsFired++;
-                if (bulletsFired >= 3) {
-                    break;
-                }
             }
         }
     }

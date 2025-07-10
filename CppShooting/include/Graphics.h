@@ -55,7 +55,12 @@ private:
     // --- バッファオブジェクト ---
     ID3D11Buffer* m_pVertexBuffer;        // プレイヤー用の頂点バッファ
     ID3D11Buffer* m_pConstantBuffer;      // 定数バッファ (オブジェクトの位置などをシェーダーに渡す)
-    ID3D11Buffer* m_pBulletVertexBuffer;  // 弾用の頂点バッファ
+
+    // --- 弾用の頂点バッファ (形状ごとに用意) ---
+    ID3D11Buffer* m_pSquareBulletVertexBuffer;   // 四角形弾用の頂点バッファ
+    ID3D11Buffer* m_pTriangleBulletVertexBuffer; // 三角形弾用の頂点バッファ
+    ID3D11Buffer* m_pPentagonBulletVertexBuffer; // 五角形弾用の頂点バッファ
+
     ID3D11Buffer* m_pObstacleVertexBuffer;// 障害物用の頂点バッファ
 
 private:

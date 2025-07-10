@@ -1,6 +1,17 @@
 #pragma once
 
 /**
+ * @enum BulletShape
+ * @brief 弾の形状を定義する列挙型
+ */
+enum class BulletShape
+{
+    Square,   // 四角形
+    Triangle, // 三角形
+    Pentagon  // 五角形
+};
+
+/**
  * @class Bullet
  * @brief プレイヤーが発射する弾を管理するクラス
  */
@@ -13,11 +24,12 @@ public:
     Bullet();
 
     /**
-     * @brief 弾を有効化し、指定した座標から発射します。
+     * @brief 弾を有効化し、指定した座標から指定した形状で発射します。
      * @param x 発射するX座標
      * @param y 発射するY座標
+     * @param shape 弾の形状
      */
-    void Activate(float x, float y);
+    void Activate(float x, float y, BulletShape shape);
 
     /**
      * @brief 弾を無効化します。（画面外に出た、敵に当たったなど）
@@ -48,9 +60,16 @@ public:
      */
     float GetY() const { return m_y; }
 
+    /**
+     * @brief 弾の形状を返します。
+     * @return 弾の形状
+     */
+    BulletShape GetShape() const { return m_shape; }
+
 private:
-    bool  m_isActive;    // 弾が有効かどうかのフラグ
-    float m_x;           // X座標
-    float m_y;           // Y座標
-    float m_velocityY;   // Y方向の移動速度
+    bool        m_isActive;    // 弾が有効かどうかのフラグ
+    float       m_x;           // X座標
+    float       m_y;           // Y座標
+    float       m_velocityY;   // Y方向の移動速度
+    BulletShape m_shape;       // 弾の形状
 };

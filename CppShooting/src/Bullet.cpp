@@ -9,7 +9,8 @@ Bullet::Bullet() :
     m_isActive(false),
     m_x(0.0f),
     m_y(0.0f),
-    m_velocityY(BULLET_SPEED) // GameConfig.h の定数で初期化
+    m_velocityY(BULLET_SPEED), // GameConfig.h の定数で初期化
+    m_shape(BulletShape::Square) // デフォルト形状を四角に
 {
 }
 
@@ -17,12 +18,14 @@ Bullet::Bullet() :
  * @brief 弾を有効化（発射）します。
  * @param x 発射位置のX座標
  * @param y 発射位置のY座標
+ * @param shape 弾の形状
  */
-void Bullet::Activate(float x, float y)
+void Bullet::Activate(float x, float y, BulletShape shape)
 {
     m_isActive = true; // 弾をアクティブ状態にする
     m_x = x;           // X座標を設定
     m_y = y;           // Y座標を設定
+    m_shape = shape;   // 形状を設定
 }
 
 /**

@@ -57,9 +57,6 @@ private:
     float m_x;                  // プレイヤーのX座標
     float m_y;                  // プレイヤーのY座標
     float m_fireCooldown;       // 弾の発射クールダウンタイマー
-
-    // ★★★ここから追加★★★
-    bool m_isAutoFireEnabled;   // オートファイアが有効かどうかのフラグ
-    bool m_wasSpaceKeyPressed;  // 前のフレームでスペースキーが押されていたか
-    // ★★★ここまで追加★★★
+    bool  m_isAutoFireEnabled;  // オートファイアが有効かどうかのフラグ
+    bool  m_wasSpaceKeyPressed; // 前のフレームでスペースキーが押されていたか
 };

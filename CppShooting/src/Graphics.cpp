@@ -40,7 +40,9 @@ Graphics::Graphics() :
     m_pVertexLayout(nullptr),
     m_pVertexBuffer(nullptr),
     m_pConstantBuffer(nullptr),
-    m_pBulletVertexBuffer(nullptr),
+    m_pSquareBulletVertexBuffer(nullptr),
+    m_pTriangleBulletVertexBuffer(nullptr),
+    m_pPentagonBulletVertexBuffer(nullptr),
     m_pObstacleVertexBuffer(nullptr)
 {
 }
@@ -92,7 +94,7 @@ HRESULT Graphics::Initialize(HWND hWnd) {
     vp.TopLeftX = 0; vp.TopLeftY = 0;
     m_pImmediateContext->RSSetViewports(1, &vp);
 
-    // --- シェーダーの作成 (変更なし) ---
+    // --- シェーダーの作成 ---
     ID3DBlob* pVSBlob = nullptr;
     const char* vsShaderCode =
         "cbuffer ConstantBuffer : register(b0) { float2 offset; };\n"
@@ -113,7 +115,7 @@ HRESULT Graphics::Initialize(HWND hWnd) {
     D3DCompile(psShaderCode, strlen(psShaderCode), nullptr, nullptr, nullptr, "PS", "ps_4_0", 0, 0, &pPSBlob, nullptr);
     m_pd3dDevice->CreatePixelShader(pPSBlob->GetBufferPointer(), pPSBlob->GetBufferSize(), nullptr, &m_pPixelShader);
 
-    // --- 入力レイアウトの作成 (変更なし) ---
+    // --- 入力レイアウトの作成 ---
     D3D11_INPUT_ELEMENT_DESC layout[] = {
         { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
@@ -122,7 +124,6 @@ HRESULT Graphics::Initialize(HWND hWnd) {
     pVSBlob->Release();
     pPSBlob->Release();
 
-    // ★★★ここから変更★★★
     // --- プレイヤーの頂点バッファ作成 (左から正方形、正三角形、正五角形) ---
     {
         SimpleVertex vertices[] = {
@@ -138,18 +139,9 @@ HRESULT Graphics::Initialize(HWND hWnd) {
             { {  0.04f, -0.04f, 0.5f }, { 0.8f, 0.2f, 0.2f, 1.0f } }, // 右下
 
             // 3. 右の正五角形 (3つの三角形で表現するため9頂点) - 緑色
-            // v0(0.07,-0.04), v1(0.05,0.02), v2(0.1,0.08), v3(0.15,0.02), v4(0.13,-0.04)
-            { { 0.07f, -0.04f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, // v0
-            { { 0.05f,  0.02f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, // v1
-            { { 0.1f,   0.08f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, // v2 (三角形1)
-
-            { { 0.07f, -0.04f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, // v0
-            { { 0.1f,   0.08f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, // v2
-            { { 0.15f,  0.02f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, // v3 (三角形2)
-
-            { { 0.07f, -0.04f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, // v0
-            { { 0.15f,  0.02f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, // v3
-            { { 0.13f, -0.04f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, // v4 (三角形3)
+            { { 0.07f, -0.04f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, { { 0.05f,  0.02f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, { { 0.1f,   0.08f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } },
+            { { 0.07f, -0.04f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, { { 0.1f,   0.08f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, { { 0.15f,  0.02f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } },
+            { { 0.07f, -0.04f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, { { 0.15f,  0.02f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, { { 0.13f, -0.04f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } },
         };
         D3D11_BUFFER_DESC bd = {};
         bd.Usage = D3D11_USAGE_DEFAULT;
@@ -159,24 +151,64 @@ HRESULT Graphics::Initialize(HWND hWnd) {
         hr = m_pd3dDevice->CreateBuffer(&bd, &InitData, &m_pVertexBuffer);
         if (FAILED(hr)) return hr;
     }
-    // ★★★ここまで変更★★★
 
-    // --- 弾・障害物・定数バッファの作成 (変更なし) ---
+    // --- 弾の頂点バッファ作成 (形状ごと) ---
+    // 1. 四角形の弾 (青い戦車に対応 -> 青系の弾)
     {
         SimpleVertex vertices[] = {
-            { { -BULLET_HALF_WIDTH, -BULLET_HALF_HEIGHT, 0.5f }, { 1.0f, 1.0f, 0.0f, 1.0f } },
-            { { -BULLET_HALF_WIDTH,  BULLET_HALF_HEIGHT, 0.5f }, { 1.0f, 1.0f, 0.0f, 1.0f } },
-            { {  BULLET_HALF_WIDTH, -BULLET_HALF_HEIGHT, 0.5f }, { 1.0f, 1.0f, 0.0f, 1.0f } },
-            { {  BULLET_HALF_WIDTH,  BULLET_HALF_HEIGHT, 0.5f }, { 1.0f, 1.0f, 0.0f, 1.0f } },
+            { { -BULLET_HALF_WIDTH, -BULLET_HALF_HEIGHT, 0.5f }, { 0.5f, 0.8f, 1.0f, 1.0f } },
+            { { -BULLET_HALF_WIDTH,  BULLET_HALF_HEIGHT, 0.5f }, { 0.5f, 0.8f, 1.0f, 1.0f } },
+            { {  BULLET_HALF_WIDTH, -BULLET_HALF_HEIGHT, 0.5f }, { 0.5f, 0.8f, 1.0f, 1.0f } },
+            { {  BULLET_HALF_WIDTH,  BULLET_HALF_HEIGHT, 0.5f }, { 0.5f, 0.8f, 1.0f, 1.0f } },
         };
         D3D11_BUFFER_DESC bd = {};
         bd.Usage = D3D11_USAGE_DEFAULT;
-        bd.ByteWidth = sizeof(SimpleVertex) * 4;
+        bd.ByteWidth = sizeof(vertices);
         bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
         D3D11_SUBRESOURCE_DATA InitData = { vertices };
-        hr = m_pd3dDevice->CreateBuffer(&bd, &InitData, &m_pBulletVertexBuffer);
+        hr = m_pd3dDevice->CreateBuffer(&bd, &InitData, &m_pSquareBulletVertexBuffer);
         if (FAILED(hr)) return hr;
     }
+    // 2. 三角形の弾 (赤い戦車に対応 -> 赤系の弾)
+    {
+        SimpleVertex vertices[] = {
+            { { -0.015f, -0.015f, 0.5f }, { 1.0f, 0.6f, 0.6f, 1.0f } },
+            { {  0.0f,    0.025f, 0.5f }, { 1.0f, 0.6f, 0.6f, 1.0f } },
+            { {  0.015f, -0.015f, 0.5f }, { 1.0f, 0.6f, 0.6f, 1.0f } },
+        };
+        D3D11_BUFFER_DESC bd = {};
+        bd.Usage = D3D11_USAGE_DEFAULT;
+        bd.ByteWidth = sizeof(vertices);
+        bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+        D3D11_SUBRESOURCE_DATA InitData = { vertices };
+        hr = m_pd3dDevice->CreateBuffer(&bd, &InitData, &m_pTriangleBulletVertexBuffer);
+        if (FAILED(hr)) return hr;
+    }
+    // 3. 五角形の弾 (緑の戦車に対応 -> 緑系の弾)
+    {
+        SimpleVertex pentagonVerts[] = {
+            { { 0.0f,    -0.02f, 0.5f }, { 0.6f, 1.0f, 0.6f, 1.0f } },
+            { {-0.019f, -0.006f, 0.5f }, { 0.6f, 1.0f, 0.6f, 1.0f } },
+            { {-0.012f,  0.016f, 0.5f }, { 0.6f, 1.0f, 0.6f, 1.0f } },
+            { { 0.012f,  0.016f, 0.5f }, { 0.6f, 1.0f, 0.6f, 1.0f } },
+            { { 0.019f, -0.006f, 0.5f }, { 0.6f, 1.0f, 0.6f, 1.0f } },
+        };
+        SimpleVertex vertices[] = { // TRIANGLELIST用に分解
+             pentagonVerts[0], pentagonVerts[1], pentagonVerts[2],
+             pentagonVerts[0], pentagonVerts[2], pentagonVerts[3],
+             pentagonVerts[0], pentagonVerts[3], pentagonVerts[4]
+        };
+        D3D11_BUFFER_DESC bd = {};
+        bd.Usage = D3D11_USAGE_DEFAULT;
+        bd.ByteWidth = sizeof(vertices);
+        bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+        D3D11_SUBRESOURCE_DATA InitData = { vertices };
+        hr = m_pd3dDevice->CreateBuffer(&bd, &InitData, &m_pPentagonBulletVertexBuffer);
+        if (FAILED(hr)) return hr;
+    }
+
+
+    // --- 障害物の頂点バッファ作成 ---
     {
         SimpleVertex vertices[] = {
             { { -0.05f, -0.05f, 0.5f }, { 0.5f, 0.5f, 0.5f, 1.0f } },
@@ -192,6 +224,8 @@ HRESULT Graphics::Initialize(HWND hWnd) {
         hr = m_pd3dDevice->CreateBuffer(&bd, &InitData, &m_pObstacleVertexBuffer);
         if (FAILED(hr)) return hr;
     }
+
+    // --- 定数バッファの作成 ---
     {
         D3D11_BUFFER_DESC cbd = {};
         cbd.Usage = D3D11_USAGE_DYNAMIC;
@@ -210,8 +244,13 @@ HRESULT Graphics::Initialize(HWND hWnd) {
  */
 void Graphics::Shutdown() {
     if (m_pImmediateContext) m_pImmediateContext->ClearState();
+
     if (m_pObstacleVertexBuffer) { m_pObstacleVertexBuffer->Release(); m_pObstacleVertexBuffer = nullptr; }
-    if (m_pBulletVertexBuffer) { m_pBulletVertexBuffer->Release(); m_pBulletVertexBuffer = nullptr; }
+    // --- 弾の頂点バッファの解放処理 ---
+    if (m_pPentagonBulletVertexBuffer) { m_pPentagonBulletVertexBuffer->Release(); m_pPentagonBulletVertexBuffer = nullptr; }
+    if (m_pTriangleBulletVertexBuffer) { m_pTriangleBulletVertexBuffer->Release(); m_pTriangleBulletVertexBuffer = nullptr; }
+    if (m_pSquareBulletVertexBuffer) { m_pSquareBulletVertexBuffer->Release(); m_pSquareBulletVertexBuffer = nullptr; }
+
     if (m_pConstantBuffer) { m_pConstantBuffer->Release(); m_pConstantBuffer = nullptr; }
     if (m_pVertexBuffer) { m_pVertexBuffer->Release(); m_pVertexBuffer = nullptr; }
     if (m_pVertexLayout) { m_pVertexLayout->Release(); m_pVertexLayout = nullptr; }
@@ -261,7 +300,6 @@ void Graphics::RenderPlayer(float x, float y)
     UINT offset = 0;
     m_pImmediateContext->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
 
-    // ★★★ここから変更★★★
     // 各パーツを描画
     // 1. 左の正方形 (頂点インデックス0から4頂点)
     m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
@@ -274,7 +312,6 @@ void Graphics::RenderPlayer(float x, float y)
     // 3. 右の正五角形 (頂点インデックス7から9頂点 = 3つの三角形)
     m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     m_pImmediateContext->Draw(9, 7);
-    // ★★★ここまで変更★★★
 }
 
 /**
@@ -284,14 +321,13 @@ void Graphics::RenderBullets(const Game& game)
 {
     UINT stride = sizeof(SimpleVertex);
     UINT offset = 0;
-    m_pImmediateContext->IASetVertexBuffers(0, 1, &m_pBulletVertexBuffer, &stride, &offset);
-    m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
     const Bullet* bullets = game.getBullets();
     for (int i = 0; i < game.getMaxBullets(); ++i)
     {
         if (bullets[i].IsActive())
         {
+            // 定数バッファに弾の座標を書き込む
             D3D11_MAPPED_SUBRESOURCE mappedResource;
             m_pImmediateContext->Map(m_pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
             ConstantBuffer* cb = (ConstantBuffer*)mappedResource.pData;
@@ -299,7 +335,27 @@ void Graphics::RenderBullets(const Game& game)
             cb->y_offset = bullets[i].GetY();
             m_pImmediateContext->Unmap(m_pConstantBuffer, 0);
 
-            m_pImmediateContext->Draw(4, 0);
+            // 弾の形状に応じて、使用する頂点バッファと描画方法を切り替える
+            switch (bullets[i].GetShape())
+            {
+            case BulletShape::Square:
+                m_pImmediateContext->IASetVertexBuffers(0, 1, &m_pSquareBulletVertexBuffer, &stride, &offset);
+                m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+                m_pImmediateContext->Draw(4, 0); // 4頂点で四角形を描画
+                break;
+
+            case BulletShape::Triangle:
+                m_pImmediateContext->IASetVertexBuffers(0, 1, &m_pTriangleBulletVertexBuffer, &stride, &offset);
+                m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+                m_pImmediateContext->Draw(3, 0); // 3頂点で三角形を描画
+                break;
+
+            case BulletShape::Pentagon:
+                m_pImmediateContext->IASetVertexBuffers(0, 1, &m_pPentagonBulletVertexBuffer, &stride, &offset);
+                m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+                m_pImmediateContext->Draw(9, 0); // 9頂点(3つの三角形)で五角形を描画
+                break;
+            }
         }
     }
 }
