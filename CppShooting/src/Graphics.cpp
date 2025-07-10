@@ -1,5 +1,6 @@
 #include "Graphics.h"
 #include <d3dcompiler.h>
+#include "GameConfig.h" // 設定ファイルを追加
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dcompiler.lib")
@@ -40,7 +41,7 @@ Graphics::~Graphics() {
     Shutdown();
 }
 
-// 初期化処理 (変更なし)
+// 初期化処理
 HRESULT Graphics::Initialize(HWND hWnd) {
     HRESULT hr = S_OK;
 
@@ -131,11 +132,12 @@ HRESULT Graphics::Initialize(HWND hWnd) {
         if (FAILED(hr)) return hr;
     }
     { // Bullet Vertex Buffer
+        // GameConfig.h の定数を使ってサイズを定義
         SimpleVertex vertices[] = {
-            { { -0.01f, -0.02f, 0.5f }, { 1.0f, 1.0f, 0.0f, 1.0f } },
-            { { -0.01f,  0.02f, 0.5f }, { 1.0f, 1.0f, 0.0f, 1.0f } },
-            { {  0.01f, -0.02f, 0.5f }, { 1.0f, 1.0f, 0.0f, 1.0f } },
-            { {  0.01f,  0.02f, 0.5f }, { 1.0f, 1.0f, 0.0f, 1.0f } },
+            { { -BULLET_HALF_WIDTH, -BULLET_HALF_HEIGHT, 0.5f }, { 1.0f, 1.0f, 0.0f, 1.0f } },
+            { { -BULLET_HALF_WIDTH,  BULLET_HALF_HEIGHT, 0.5f }, { 1.0f, 1.0f, 0.0f, 1.0f } },
+            { {  BULLET_HALF_WIDTH, -BULLET_HALF_HEIGHT, 0.5f }, { 1.0f, 1.0f, 0.0f, 1.0f } },
+            { {  BULLET_HALF_WIDTH,  BULLET_HALF_HEIGHT, 0.5f }, { 1.0f, 1.0f, 0.0f, 1.0f } },
         };
         D3D11_BUFFER_DESC bd = {};
         bd.Usage = D3D11_USAGE_DEFAULT;
@@ -173,7 +175,7 @@ HRESULT Graphics::Initialize(HWND hWnd) {
     return S_OK;
 }
 
-// クリーンアップ処理 (変更なし)
+// クリーンアップ処理
 void Graphics::Shutdown() {
     if (m_pImmediateContext) m_pImmediateContext->ClearState();
     if (m_pObstacleVertexBuffer) { m_pObstacleVertexBuffer->Release(); m_pObstacleVertexBuffer = nullptr; }

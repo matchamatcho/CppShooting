@@ -1,11 +1,12 @@
 #include "Bullet.h"
+#include "GameConfig.h" // 設定ファイルを追加
 
 // コンストラクタ
 Bullet::Bullet() :
     m_isActive(false),
     m_x(0.0f),
     m_y(0.0f),
-    m_velocityY(0.05f)
+    m_velocityY(BULLET_SPEED) // 定数を使用
 {
 }
 
