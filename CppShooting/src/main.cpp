@@ -49,8 +49,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int) {
                 DispatchMessage(&msg);
             }
             else {
-                // 描画処理
-                g_pGraphics->RenderFrame();
+                // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼ 追加 ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
+                // 'P'キーが押されたらループを抜けてプログラムを終了する
+                if (GetAsyncKeyState('P') & 0x8000) {
+                    break;
+                }
+                // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲ 追加 ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
+                // 状態の更新と描画
+                g_pGraphics->Update();       // 状態を更新
+                g_pGraphics->RenderFrame();  // 描画
             }
         }
     }
