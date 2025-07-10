@@ -42,14 +42,24 @@ private:
     void HandleMovement();
 
     /**
-     * @brief キー入力に基づいて弾を発射します。
+     * @brief キー入力に基づいてオートファイアの状態を切り替えます。
+     */
+    void HandleFireToggle();
+
+    /**
+     * @brief オートファイアが有効な場合に弾を発射します。
      * @param bullets ゲーム内に存在する弾の配列へのポインタ
      * @param maxBullets 弾の最大数
      */
     void HandleShooting(Bullet* bullets, int maxBullets);
 
 private:
-    float m_x;              // プレイヤーのX座標
-    float m_y;              // プレイヤーのY座標
-    float m_fireCooldown;   // 弾の発射クールダウンタイマー
+    float m_x;                  // プレイヤーのX座標
+    float m_y;                  // プレイヤーのY座標
+    float m_fireCooldown;       // 弾の発射クールダウンタイマー
+
+    // ★★★ここから追加★★★
+    bool m_isAutoFireEnabled;   // オートファイアが有効かどうかのフラグ
+    bool m_wasSpaceKeyPressed;  // 前のフレームでスペースキーが押されていたか
+    // ★★★ここまで追加★★★
 };
