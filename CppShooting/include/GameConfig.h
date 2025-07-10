@@ -12,7 +12,7 @@ const float BULLET_HALF_HEIGHT = 0.02f;    // ’e‚Ì‚‚³‚Ì”¼•ª
 const float BULLET_SPEED = 0.05f;           // ’e‚Ì”ò‚Ô‘¬“x
 
 // --- áŠQ•¨ŠÖ˜A ---
-const float OBSTACLE_SPAWN_INTERVAL = 10.0f; // áŠQ•¨‚ªŽŸ‚ÉoŒ»‚·‚é‚Ü‚Å‚ÌŽžŠÔ
+const float OBSTACLE_SPAWN_INTERVAL = 3.0f; // áŠQ•¨‚ªŽŸ‚ÉoŒ»‚·‚é‚Ü‚Å‚ÌŽžŠÔ
 const int   OBSTACLE_DEFAULT_HP = 3;         // áŠQ•¨‚Ì‰ŠúHP
 const float OBSTACLE_COLLISION_RADIUS = 0.05f; // áŠQ•¨‚Æ‚Ì“–‚½‚è”»’è‚Ì”¼Œa
 
