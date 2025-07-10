@@ -1,16 +1,14 @@
 #include "Game.h"
-#include "GameConfig.h" // ゲーム設定ファイルをインクルード
-#include <time.h>       // 乱数の初期化 (srand) のために必要
-#include <stdlib.h>     // 乱数 (rand) のために必要
+#include "GameConfig.h" 
+#include <time.h>       
+#include <stdlib.h>     
 
 /**
  * @brief Gameクラスのコンストラクタ
  * メンバ変数の初期化と乱数シードの設定を行います。
  */
 Game::Game() :
-    m_playerX(0.0f),
-    m_playerY(0.0f),
-    m_fireCooldown(0.0f),
+    m_player(), // Playerオブジェクトを初期化
     m_obstacleSpawnTimer(0.0f)
 {
     // 乱数のシードを現在時刻で初期化
@@ -22,57 +20,20 @@ Game::Game() :
  */
 void Game::Update()
 {
-    UpdatePlayer();    // プレイヤーの移動などを処理
-    UpdateBullets();   // 弾の移動と発射を処理
+    // PlayerクラスのUpdateを呼び出し、プレイヤーの操作と弾の発射を行う
+    m_player.Update(m_bullets, MAX_BULLETS);
+
+    UpdateBullets();   // 弾の移動を処理
     UpdateObstacles(); // 障害物の出現を処理
     CheckCollisions(); // 衝突判定を処理
 }
 
 /**
- * @brief プレイヤーの状態を更新します。
- * キー入力に応じた移動と、画面外への移動制限を行います。
- */
-void Game::UpdatePlayer()
-{
-    // 'W', 'S', 'A', 'D' キーでプレイヤーを移動 (GameConfig.h の定数を使用)
-    if (GetAsyncKeyState('W') & 0x8000) m_playerY += PLAYER_MOVE_SPEED;
-    if (GetAsyncKeyState('S') & 0x8000) m_playerY -= PLAYER_MOVE_SPEED;
-    if (GetAsyncKeyState('A') & 0x8000) m_playerX -= PLAYER_MOVE_SPEED;
-    if (GetAsyncKeyState('D') & 0x8000) m_playerX += PLAYER_MOVE_SPEED;
-
-    // プレイヤーが画面外に出ないように座標を制限
-    if (m_playerX > 0.95f) m_playerX = 0.95f;
-    if (m_playerX < -0.95f) m_playerX = -0.95f;
-    if (m_playerY > 0.95f) m_playerY = 0.95f;
-    if (m_playerY < -0.95f) m_playerY = -0.95f;
-}
-
-/**
  * @brief 弾の状態を更新します。
- * クールダウンに基づいて新しい弾を発射し、既存の弾の位置を更新します。
+ * 発射ロジックはPlayerクラスに移譲し、ここでは弾の移動のみを担当します。
  */
 void Game::UpdateBullets()
 {
-    // 発射クールダウンタイマーを減らす
-    m_fireCooldown -= 0.1f;
-
-    // クールダウンが終了したら新しい弾を発射
-    if (m_fireCooldown <= 0.0f)
-    {
-        m_fireCooldown = PLAYER_FIRE_COOLDOWN; // クールダウンをリセット (GameConfig.h の定数を使用)
-
-        // 非アクティブな弾を探して再利用する
-        for (int i = 0; i < MAX_BULLETS; ++i)
-        {
-            if (!m_bullets[i].IsActive())
-            {
-                // プレイヤーの少し前から弾を発射
-                m_bullets[i].Activate(m_playerX, m_playerY + 0.05f);
-                break; // 1発撃ったらループを抜ける
-            }
-        }
-    }
-
     // すべての弾の位置を更新
     for (int i = 0; i < MAX_BULLETS; ++i)
     {
@@ -104,7 +65,7 @@ void Game::UpdateObstacles()
             {
                 // X座標をランダムに決定し、画面上部から出現させる
                 float x = (rand() / (float)RAND_MAX) * 1.8f - 0.9f;
-                float y = 0.9f;
+                float y = 1.0f;
                 // HPの初期値を定数で設定
                 m_obstacles[i].Activate(x, y, OBSTACLE_DEFAULT_HP);
                 break; // 1つ出現させたらループを抜ける
