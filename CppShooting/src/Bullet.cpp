@@ -2,17 +2,14 @@
 
 // コンストラクタ
 Bullet::Bullet() :
-    m_isActive(false),   // 最初は非アクティブ
+    m_isActive(false),
     m_x(0.0f),
     m_y(0.0f),
-    m_velocityY(0.05f)   // 弾の移動速度
+    m_velocityY(0.05f)
 {
 }
 
 // 弾を有効化（発射）する
-// 引数:
-//   x: 発射するX座標
-//   y: 発射するY座標
 void Bullet::Activate(float x, float y)
 {
     m_isActive = true;
@@ -29,7 +26,6 @@ void Bullet::Deactivate()
 // 弾の位置を更新する
 void Bullet::Update()
 {
-    // 弾が有効な場合のみ処理を行う
     if (m_isActive)
     {
         // 弾をY方向に移動させる

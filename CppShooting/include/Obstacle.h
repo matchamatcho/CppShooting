@@ -1,23 +1,24 @@
 #pragma once
 
-// 弾を管理するクラス
-class Bullet
+// 障害物を管理するクラス
+class Obstacle
 {
 public:
     // コンストラクタ
-    Bullet();
+    Obstacle();
 
-    // 弾を有効化（発射）する
-    void Activate(float x, float y);
+    // 障害物を有効化する
+    void Activate(float x, float y, int hp);
 
-    // 弾を無効化する
+    // 障害物を無効化する
     void Deactivate();
 
-    // 弾の位置を更新する
-    void Update();
-
-    // 弾が有効かどうかを返す
+    // 障害物が有効かどうかを返す
     bool IsActive() const { return m_isActive; }
+
+    // 障害物のHPが減る処理
+    void Hit();
+
     // X座標を返す
     float GetX() const { return m_x; }
     // Y座標を返す
@@ -27,5 +28,5 @@ private:
     bool  m_isActive;
     float m_x;
     float m_y;
-    float m_velocityY;
+    int   m_hp;
 };

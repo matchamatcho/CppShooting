@@ -56,6 +56,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int) {
                 }
                 // ££££££££££££££££££££££ ’Ç‰Á ££££££££££££££££££££££
 
+
                 // ó‘Ô‚ÌXV‚Æ•`‰æ
                 g_pGraphics->Update();       // ó‘Ô‚ðXV
                 g_pGraphics->RenderFrame();  // •`‰æ
