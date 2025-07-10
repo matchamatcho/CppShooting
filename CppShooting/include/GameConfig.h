@@ -4,7 +4,7 @@
 
 // --- プレイヤー関連 ---
 const float PLAYER_MOVE_SPEED = 0.02f;      // プレイヤーの移動速度
-const float PLAYER_FIRE_COOLDOWN = 1.0f;    // 弾の発射クールダウン時間 (値が小さいほど連射速度が上がる)
+const float PLAYER_FIRE_COOLDOWN = 1.0f;    // 弾の発射クールダウン時間 (値が小さいほど連射速度が上がる) ★変更：3.0f -> 5.0f
 
 // --- 弾関連 ---
 const float BULLET_HALF_WIDTH = 0.005f;     // 弾の幅の半分
