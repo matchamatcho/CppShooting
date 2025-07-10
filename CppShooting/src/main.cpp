@@ -1,8 +1,10 @@
 #include <windows.h>
 #include "Graphics.h"
+#include "Game.h"
 
 // グローバル変数
 Graphics* g_pGraphics = nullptr;
+Game* g_pGame = nullptr;
 
 // ウィンドウプロシージャ
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
@@ -18,30 +20,27 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 
 // メイン関数
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int) {
-    // ウィンドウクラスの登録
     WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, WndProc, 0L, 0L,
                       GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr,
                       L"SimpleGame", nullptr };
     RegisterClassEx(&wc);
 
-    // ウィンドウの作成
-    HWND hWnd = CreateWindow(L"SimpleGame", L"DirectX 11 Simple Game (Split Files)",
+    HWND hWnd = CreateWindow(L"SimpleGame", L"DirectX 11 Simple Game (Refactored)",
         WS_OVERLAPPEDWINDOW, 100, 100, 800, 600,
         nullptr, nullptr, wc.hInstance, nullptr);
 
-    // Graphicsクラスのインスタンスを作成
+    // GraphicsとGameクラスのインスタンスを作成
     g_pGraphics = new Graphics();
-    if (!g_pGraphics) {
+    g_pGame = new Game();
+
+    if (!g_pGraphics || !g_pGame) {
         return -1;
     }
 
-    // DirectXの初期化
     if (SUCCEEDED(g_pGraphics->Initialize(hWnd))) {
-        // ウィンドウの表示
         ShowWindow(hWnd, SW_SHOWDEFAULT);
         UpdateWindow(hWnd);
 
-        // メインループ
         MSG msg = { 0 };
         while (WM_QUIT != msg.message) {
             if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
@@ -49,17 +48,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int) {
                 DispatchMessage(&msg);
             }
             else {
-                // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼ 追加 ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
-                // 'P'キーが押されたらループを抜けてプログラムを終了する
                 if (GetAsyncKeyState('P') & 0x8000) {
                     break;
                 }
-                // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲ 追加 ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
-
 
                 // 状態の更新と描画
-                g_pGraphics->Update();       // 状態を更新
-                g_pGraphics->RenderFrame();  // 描画
+                g_pGame->Update();                  // ゲームの状態を更新
+                g_pGraphics->RenderFrame(*g_pGame); // ゲームの状態を元に描画
             }
         }
     }
@@ -70,6 +65,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int) {
         delete g_pGraphics;
         g_pGraphics = nullptr;
     }
+    if (g_pGame) {
+        delete g_pGame;
+        g_pGame = nullptr;
+    }
+
 
     UnregisterClass(L"SimpleGame", wc.hInstance);
     return 0;
