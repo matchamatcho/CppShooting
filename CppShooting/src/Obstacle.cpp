@@ -8,7 +8,8 @@ Obstacle::Obstacle() :
     m_isActive(false),
     m_x(0.0f),
     m_y(0.0f),
-    m_hp(0)
+    m_hp(0),
+    m_shape(BulletShape::Square) // デフォルト形状
 {
 }
 
@@ -17,13 +18,15 @@ Obstacle::Obstacle() :
  * @param x 出現位置のX座標
  * @param y 出現位置のY座標
  * @param hp 初期HP
+ * @param shape 障害物の形状
  */
-void Obstacle::Activate(float x, float y, int hp)
+void Obstacle::Activate(float x, float y, int hp, BulletShape shape)
 {
     m_isActive = true; // 障害物をアクティブ状態にする
     m_x = x;           // X座標を設定
     m_y = y;           // Y座標を設定
     m_hp = hp;         // HPを設定
+    m_shape = shape;   // 形状を設定
 }
 
 /**

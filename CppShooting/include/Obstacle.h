@@ -1,4 +1,5 @@
 #pragma once
+#include "Bullet.h" // BulletShapeを共有するためインクルード
 
 /**
  * @class Obstacle
@@ -17,8 +18,9 @@ public:
      * @param x 出現させるX座標
      * @param y 出現させるY座標
      * @param hp 初期HP
+     * @param shape 障害物の形状
      */
-    void Activate(float x, float y, int hp);
+    void Activate(float x, float y, int hp, BulletShape shape);
 
     /**
      * @brief 障害物を無効化します。
@@ -49,9 +51,16 @@ public:
      */
     float GetY() const { return m_y; }
 
+    /**
+     * @brief 障害物の形状を返します。
+     * @return 障害物の形状
+     */
+    BulletShape GetShape() const { return m_shape; }
+
 private:
-    bool  m_isActive; // 障害物が有効かどうかのフラグ
-    float m_x;        // X座標
-    float m_y;        // Y座標
-    int   m_hp;       // ヒットポイント（耐久値）
+    bool        m_isActive; // 障害物が有効かどうかのフラグ
+    float       m_x;        // X座標
+    float       m_y;        // Y座標
+    int         m_hp;       // ヒットポイント（耐久値）
+    BulletShape m_shape;    // 障害物の形状
 };
