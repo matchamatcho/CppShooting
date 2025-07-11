@@ -14,8 +14,8 @@ struct ConstantBuffer
 {
     float x_offset; // X方向のオフセット
     float y_offset; // Y方向のオフセット
+    float scale;    // ★追加: オブジェクトの拡大率
     float padding1; // 16バイトアライメントのためのパディング
-    float padding2; // 16バイトアライメントのためのパディング
 };
 
 /**
@@ -96,13 +96,16 @@ HRESULT Graphics::Initialize(HWND hWnd) {
 
     // --- シェーダーの作成 ---
     ID3DBlob* pVSBlob = nullptr;
+    // ★変更: 頂点シェーダーにscaleの処理を追加
     const char* vsShaderCode =
-        "cbuffer ConstantBuffer : register(b0) { float2 offset; };\n"
+        "cbuffer ConstantBuffer : register(b0) { float2 offset; float scale; float padding; };\n"
         "struct VS_INPUT { float4 Pos : POSITION; float4 Color : COLOR; };\n"
         "struct PS_INPUT { float4 Pos : SV_POSITION; float4 Color : COLOR; };\n"
         "PS_INPUT VS(VS_INPUT input) {\n"
         "    PS_INPUT output = (PS_INPUT)0;\n"
-        "    output.Pos = input.Pos; output.Pos.xy += offset;\n"
+        "    output.Pos = input.Pos;\n"
+        "    output.Pos.xy *= scale;\n" // 拡大・縮小
+        "    output.Pos.xy += offset;\n"// 平行移動
         "    output.Color = input.Color; return output;\n"
         "}\n";
     D3DCompile(vsShaderCode, strlen(vsShaderCode), nullptr, nullptr, nullptr, "VS", "vs_4_0", 0, 0, &pVSBlob, nullptr);
@@ -208,7 +211,7 @@ HRESULT Graphics::Initialize(HWND hWnd) {
     }
 
 
-    // --- 障害物の頂点バッファ作成 ---
+    // --- 障害物の頂点バッファ作成 (形状は動的に変わるため、ここではダミーとして作成) ---
     {
         SimpleVertex vertices[] = {
             { { -0.05f, -0.05f, 0.5f }, { 0.5f, 0.5f, 0.5f, 1.0f } },
@@ -221,6 +224,7 @@ HRESULT Graphics::Initialize(HWND hWnd) {
         bd.ByteWidth = sizeof(SimpleVertex) * 4;
         bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
         D3D11_SUBRESOURCE_DATA InitData = { vertices };
+        // m_pObstacleVertexBuffer はもう使わないが、解放処理のために残しておく
         hr = m_pd3dDevice->CreateBuffer(&bd, &InitData, &m_pObstacleVertexBuffer);
         if (FAILED(hr)) return hr;
     }
@@ -293,6 +297,7 @@ void Graphics::RenderPlayer(float x, float y)
     ConstantBuffer* cb = (ConstantBuffer*)mappedResource.pData;
     cb->x_offset = x;
     cb->y_offset = y;
+    cb->scale = 1.0f; // プレイヤーの倍率は1.0で固定
     m_pImmediateContext->Unmap(m_pConstantBuffer, 0);
 
     // プレイヤーの頂点バッファを設定
@@ -333,6 +338,7 @@ void Graphics::RenderBullets(const Game& game)
             ConstantBuffer* cb = (ConstantBuffer*)mappedResource.pData;
             cb->x_offset = bullets[i].GetX();
             cb->y_offset = bullets[i].GetY();
+            cb->scale = 1.0f; // 弾の倍率は1.0で固定
             m_pImmediateContext->Unmap(m_pConstantBuffer, 0);
 
             // 弾の形状に応じて、使用する頂点バッファと描画方法を切り替える
@@ -367,8 +373,6 @@ void Graphics::RenderObstacles(const Game& game)
 {
     UINT stride = sizeof(SimpleVertex);
     UINT offset = 0;
-    m_pImmediateContext->IASetVertexBuffers(0, 1, &m_pObstacleVertexBuffer, &stride, &offset);
-    m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
     const Obstacle* obstacles = game.getObstacles();
     for (int i = 0; i < game.getMaxObstacles(); ++i)
@@ -380,9 +384,30 @@ void Graphics::RenderObstacles(const Game& game)
             ConstantBuffer* cb = (ConstantBuffer*)mappedResource.pData;
             cb->x_offset = obstacles[i].GetX();
             cb->y_offset = obstacles[i].GetY();
+            cb->scale = OBSTACLE_SCALE; // ★変更: GameConfig.hから読み込んだ倍率を設定
             m_pImmediateContext->Unmap(m_pConstantBuffer, 0);
 
-            m_pImmediateContext->Draw(4, 0);
+            // 障害物の形状に応じて、使用する頂点バッファと描画方法を切り替える
+            switch (obstacles[i].GetShape())
+            {
+            case BulletShape::Square:
+                m_pImmediateContext->IASetVertexBuffers(0, 1, &m_pSquareBulletVertexBuffer, &stride, &offset);
+                m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+                m_pImmediateContext->Draw(4, 0);
+                break;
+
+            case BulletShape::Triangle:
+                m_pImmediateContext->IASetVertexBuffers(0, 1, &m_pTriangleBulletVertexBuffer, &stride, &offset);
+                m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+                m_pImmediateContext->Draw(3, 0);
+                break;
+
+            case BulletShape::Pentagon:
+                m_pImmediateContext->IASetVertexBuffers(0, 1, &m_pPentagonBulletVertexBuffer, &stride, &offset);
+                m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+                m_pImmediateContext->Draw(9, 0);
+                break;
+            }
         }
     }
 }

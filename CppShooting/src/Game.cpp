@@ -66,8 +66,24 @@ void Game::UpdateObstacles()
                 // X座標をランダムに決定し、画面上部から出現させる
                 float x = (rand() / (float)RAND_MAX) * 1.8f - 0.9f;
                 float y = 1.0f;
-                // HPの初期値を定数で設定
-                m_obstacles[i].Activate(x, y, OBSTACLE_DEFAULT_HP);
+
+                // 形状をランダムに決定
+                int shapeType = rand() % 3; // 0, 1, 2のいずれかの値
+                BulletShape shape;
+                switch (shapeType) {
+                case 0:
+                    shape = BulletShape::Square;
+                    break;
+                case 1:
+                    shape = BulletShape::Triangle;
+                    break;
+                case 2:
+                    shape = BulletShape::Pentagon;
+                    break;
+                }
+
+                // HPの初期値を定数で設定し、形状も渡す
+                m_obstacles[i].Activate(x, y, OBSTACLE_DEFAULT_HP, shape);
                 break; // 1つ出現させたらループを抜ける
             }
         }
