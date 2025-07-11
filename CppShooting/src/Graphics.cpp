@@ -14,8 +14,8 @@ struct ConstantBuffer
 {
     float x_offset; // X方向のオフセット
     float y_offset; // Y方向のオフセット
+    float scale;    // ★追加: オブジェクトの拡大率
     float padding1; // 16バイトアライメントのためのパディング
-    float padding2; // 16バイトアライメントのためのパディング
 };
 
 /**
@@ -96,13 +96,16 @@ HRESULT Graphics::Initialize(HWND hWnd) {
 
     // --- シェーダーの作成 ---
     ID3DBlob* pVSBlob = nullptr;
+    // ★変更: 頂点シェーダーにscaleの処理を追加
     const char* vsShaderCode =
-        "cbuffer ConstantBuffer : register(b0) { float2 offset; };\n"
+        "cbuffer ConstantBuffer : register(b0) { float2 offset; float scale; float padding; };\n"
         "struct VS_INPUT { float4 Pos : POSITION; float4 Color : COLOR; };\n"
         "struct PS_INPUT { float4 Pos : SV_POSITION; float4 Color : COLOR; };\n"
         "PS_INPUT VS(VS_INPUT input) {\n"
         "    PS_INPUT output = (PS_INPUT)0;\n"
-        "    output.Pos = input.Pos; output.Pos.xy += offset;\n"
+        "    output.Pos = input.Pos;\n"
+        "    output.Pos.xy *= scale;\n" // 拡大・縮小
+        "    output.Pos.xy += offset;\n"// 平行移動
         "    output.Color = input.Color; return output;\n"
         "}\n";
     D3DCompile(vsShaderCode, strlen(vsShaderCode), nullptr, nullptr, nullptr, "VS", "vs_4_0", 0, 0, &pVSBlob, nullptr);
@@ -294,6 +297,7 @@ void Graphics::RenderPlayer(float x, float y)
     ConstantBuffer* cb = (ConstantBuffer*)mappedResource.pData;
     cb->x_offset = x;
     cb->y_offset = y;
+    cb->scale = 1.0f; // プレイヤーの倍率は1.0で固定
     m_pImmediateContext->Unmap(m_pConstantBuffer, 0);
 
     // プレイヤーの頂点バッファを設定
@@ -334,6 +338,7 @@ void Graphics::RenderBullets(const Game& game)
             ConstantBuffer* cb = (ConstantBuffer*)mappedResource.pData;
             cb->x_offset = bullets[i].GetX();
             cb->y_offset = bullets[i].GetY();
+            cb->scale = 1.0f; // 弾の倍率は1.0で固定
             m_pImmediateContext->Unmap(m_pConstantBuffer, 0);
 
             // 弾の形状に応じて、使用する頂点バッファと描画方法を切り替える
@@ -379,6 +384,7 @@ void Graphics::RenderObstacles(const Game& game)
             ConstantBuffer* cb = (ConstantBuffer*)mappedResource.pData;
             cb->x_offset = obstacles[i].GetX();
             cb->y_offset = obstacles[i].GetY();
+            cb->scale = OBSTACLE_SCALE; // ★変更: GameConfig.hから読み込んだ倍率を設定
             m_pImmediateContext->Unmap(m_pConstantBuffer, 0);
 
             // 障害物の形状に応じて、使用する頂点バッファと描画方法を切り替える
