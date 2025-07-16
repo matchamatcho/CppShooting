@@ -9,7 +9,13 @@ Player::Player() :
     m_y(-0.8f),
     m_fireCooldown(0.0f),
     m_isAutoFireEnabled(false),
-    m_wasSpaceKeyPressed(false)
+    m_wasSpaceKeyPressed(false),
+    m_leftShape(BulletShape::Square),
+    m_centerShape(BulletShape::Triangle),
+    m_rightShape(BulletShape::Pentagon),
+    m_wasZKeyPressed(false),
+    m_wasXKeyPressed(false),
+    m_wasCKeyPressed(false)
 {
 }
 
@@ -26,8 +32,13 @@ void Player::Update(Bullet* bullets, int maxBullets)
     // 移動処理
     HandleMovement();
 
-    // 射撃のトグル処理と、実際の射撃処理を分離
+    // 射撃のトグル処理
     HandleFireToggle();
+
+    // 形状変更の処理
+    HandleShapeChange();
+
+    // 射撃処理
     HandleShooting(bullets, maxBullets);
 }
 
@@ -54,18 +65,30 @@ void Player::HandleMovement()
  */
 void Player::HandleFireToggle()
 {
-    // 現在のスペースキーの状態を取得
-    bool isSpaceKeyDown = (GetAsyncKeyState(VK_SPACE) & 0x8000);
-
-    // 「直前のフレームでは押されておらず、現在のフレームで押されている」場合、トグルを切り替える
-    if (isSpaceKeyDown && !m_wasSpaceKeyPressed) {
+    if (IsKeyPressedOnce(VK_SPACE, m_wasSpaceKeyPressed))
+    {
         m_isAutoFireEnabled = !m_isAutoFireEnabled; // bool値を反転させる
     }
-
-    // 現在のキーの状態を「直前の状態」として保存する
-    m_wasSpaceKeyPressed = isSpaceKeyDown;
 }
 
+/**
+ * @brief 'Z', 'X', 'C' キー入力に基づいて戦車の形状を変更します。
+ */
+void Player::HandleShapeChange()
+{
+    if (IsKeyPressedOnce('Z', m_wasZKeyPressed))
+    {
+        m_leftShape = GetNextShape(m_leftShape);
+    }
+    if (IsKeyPressedOnce('X', m_wasXKeyPressed))
+    {
+        m_centerShape = GetNextShape(m_centerShape);
+    }
+    if (IsKeyPressedOnce('C', m_wasCKeyPressed))
+    {
+        m_rightShape = GetNextShape(m_rightShape);
+    }
+}
 
 /**
  * @brief オートファイアが有効な場合に弾を発射します。
@@ -78,9 +101,9 @@ void Player::HandleShooting(Bullet* bullets, int maxBullets)
         m_fireCooldown = PLAYER_FIRE_COOLDOWN; // クールダウンをリセット
 
         // 発射する弾の形状と、それぞれの発射位置オフセットを定義
-        BulletShape shapesToFire[] = { BulletShape::Square, BulletShape::Triangle, BulletShape::Pentagon };
-        float firePosX[] = { -0.1f, 0.0f, 0.1f }; // 四角、三角、五角の弾のX位置
-        float firePosY[] = { 0.06f, 0.1f, 0.06f }; // 四角、三角、五角の弾のY位置
+        BulletShape shapesToFire[] = { m_leftShape, m_centerShape, m_rightShape };
+        float firePosX[] = { -0.1f, 0.0f, 0.1f }; // 左、中央、右の弾のX位置
+        float firePosY[] = { 0.06f, 0.1f, 0.06f }; // 左、中央、右の弾のY位置
         int numBulletsToFire = 3;
 
         int bulletsFired = 0;
@@ -98,5 +121,39 @@ void Player::HandleShooting(Bullet* bullets, int maxBullets)
                 bulletsFired++;
             }
         }
+    }
+}
+
+/**
+ * @brief 指定されたキーが押された瞬間かどうかを判定します。
+ * @param vKey 判定する仮想キーコード
+ * @param wasKeyPressedLastFrame 前のフレームでそのキーが押されていたかどうかの状態を保持する変数への参照
+ * @return bool 押された瞬間であればtrue
+ */
+bool Player::IsKeyPressedOnce(int vKey, bool& wasKeyPressedLastFrame)
+{
+    bool isKeyDown = (GetAsyncKeyState(vKey) & 0x8000);
+    bool keyPressedOnce = isKeyDown && !wasKeyPressedLastFrame;
+    wasKeyPressedLastFrame = isKeyDown;
+    return keyPressedOnce;
+}
+
+/**
+ * @brief 次の弾の形状を返します。(正方形 -> 三角形 -> 五角形 -> 正方形)
+ * @param currentShape 現在の形状
+ * @return BulletShape 次の形状
+*/
+BulletShape Player::GetNextShape(BulletShape currentShape)
+{
+    switch (currentShape)
+    {
+    case BulletShape::Square:
+        return BulletShape::Triangle;
+    case BulletShape::Triangle:
+        return BulletShape::Pentagon;
+    case BulletShape::Pentagon:
+        return BulletShape::Square;
+    default:
+        return BulletShape::Square; // 不明な形状の場合はデフォルトに戻す
     }
 }

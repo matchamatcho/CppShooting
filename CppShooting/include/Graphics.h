@@ -53,19 +53,36 @@ private:
     ID3D11InputLayout* m_pVertexLayout;        // 入力レイアウト
 
     // --- バッファオブジェクト ---
-    ID3D11Buffer* m_pVertexBuffer;        // プレイヤー用の頂点バッファ
     ID3D11Buffer* m_pConstantBuffer;      // 定数バッファ (オブジェクトの位置などをシェーダーに渡す)
 
-    // --- 弾用の頂点バッファ (形状ごとに用意) ---
-    ID3D11Buffer* m_pSquareBulletVertexBuffer;   // 四角形弾用の頂点バッファ
-    ID3D11Buffer* m_pTriangleBulletVertexBuffer; // 三角形弾用の頂点バッファ
-    ID3D11Buffer* m_pPentagonBulletVertexBuffer; // 五角形弾用の頂点バッファ
+    // --- 形状ごとの頂点バッファ ---
+    ID3D11Buffer* m_pSquareVertexBuffer;
+    ID3D11Buffer* m_pTriangleVertexBuffer;
+    ID3D11Buffer* m_pPentagonVertexBuffer;
+    ID3D11Buffer* m_pObstacleVertexBuffer; // 障害物用の頂点バッファ (現在は弾のバッファを再利用)
 
-    ID3D11Buffer* m_pObstacleVertexBuffer;// 障害物用の頂点バッファ
 
 private:
     // --- 描画処理のヘルパー関数 ---
-    void RenderPlayer(float x, float y);
+    /**
+     * @brief プレイヤーを描画します。
+     * @param x プレイヤーのX座標
+     * @param y プレイヤーのY座標
+     * @param leftShape 左の戦車の形状
+     * @param centerShape 真ん中の戦車の形状
+     * @param rightShape 右の戦車の形状
+     */
+    void RenderPlayer(float x, float y, BulletShape leftShape, BulletShape centerShape, BulletShape rightShape);
+
     void RenderBullets(const Game& game);
     void RenderObstacles(const Game& game);
+
+    /**
+     * @brief 指定された形状を描画します。
+     * @param shape 描画する形状
+     * @param xOffset X座標のオフセット
+     * @param yOffset Y座標のオフセット
+     * @param scale 拡大率
+     */
+    void DrawShape(BulletShape shape, float xOffset, float yOffset, float scale);
 };
