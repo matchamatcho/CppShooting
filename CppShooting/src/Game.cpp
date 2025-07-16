@@ -64,8 +64,9 @@ void Game::UpdateObstacles()
             if (!m_obstacles[i].IsActive())
             {
                 // X座標をランダムに決定し、画面上部から出現させる
-                float x = (rand() / (float)RAND_MAX) * 1.8f - 0.9f;
-                float y = 1.0f;
+                float x = (rand() / (float)RAND_MAX) * 1.54f - 0.77f;
+                // Y座標をオブジェクトの大きさを考慮した値に修正 (修正箇所)
+                float y = 0.75f;
 
                 // 形状をランダムに決定
                 int shapeType = rand() % 3; // 0, 1, 2のいずれかの値
