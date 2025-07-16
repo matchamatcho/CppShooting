@@ -1,6 +1,7 @@
 #include <windows.h>
 #include "Graphics.h"
 #include "Game.h"
+#include "GameConfig.h" // キー設定を読み込むためにインクルード
 
 // --- グローバル変数 ---
 // プログラム全体からアクセスできるように、GraphicsとGameのインスタンスをグローバルに保持
@@ -72,8 +73,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int) {
                 DispatchMessage(&msg);
             }
             else {
-                // 'P'キーが押されたらループを抜けて終了
-                if (GetAsyncKeyState('P') & 0x8000) {
+                // 設定ファイルで定義した終了キーが押されたらループを抜ける
+                if (GetAsyncKeyState(KEY_QUIT) & 0x8000) {
                     break;
                 }
 

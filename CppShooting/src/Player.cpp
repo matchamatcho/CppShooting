@@ -1,5 +1,5 @@
 #include "Player.h"
-#include "GameConfig.h" // PLAYER_MOVE_SPEEDなどの設定値を利用するため
+#include "GameConfig.h" // PLAYER_MOVE_SPEEDやキー設定を利用するため
 
 /**
  * @brief Playerクラスのコンストラクタ
@@ -47,11 +47,11 @@ void Player::Update(Bullet* bullets, int maxBullets)
  */
 void Player::HandleMovement()
 {
-    // 'W', 'S', 'A', 'D' キーでプレイヤーを移動
-    if (GetAsyncKeyState('W') & 0x8000) m_y += PLAYER_MOVE_SPEED;
-    if (GetAsyncKeyState('S') & 0x8000) m_y -= PLAYER_MOVE_SPEED;
-    if (GetAsyncKeyState('A') & 0x8000) m_x -= PLAYER_MOVE_SPEED;
-    if (GetAsyncKeyState('D') & 0x8000) m_x += PLAYER_MOVE_SPEED;
+    // GameConfig.hで設定されたキーでプレイヤーを移動
+    if (GetAsyncKeyState(KEY_MOVE_UP) & 0x8000) m_y += PLAYER_MOVE_SPEED;
+    if (GetAsyncKeyState(KEY_MOVE_DOWN) & 0x8000) m_y -= PLAYER_MOVE_SPEED;
+    if (GetAsyncKeyState(KEY_MOVE_LEFT) & 0x8000) m_x -= PLAYER_MOVE_SPEED;
+    if (GetAsyncKeyState(KEY_MOVE_RIGHT) & 0x8000) m_x += PLAYER_MOVE_SPEED;
 
     // プレイヤーが画面外に出ないように座標を制限
     if (m_x > 0.85f) m_x = 0.85f;
@@ -65,26 +65,26 @@ void Player::HandleMovement()
  */
 void Player::HandleFireToggle()
 {
-    if (IsKeyPressedOnce(VK_SPACE, m_wasSpaceKeyPressed))
+    if (IsKeyPressedOnce(KEY_TOGGLE_AUTOFIRE, m_wasSpaceKeyPressed))
     {
         m_isAutoFireEnabled = !m_isAutoFireEnabled; // bool値を反転させる
     }
 }
 
 /**
- * @brief 'Z', 'X', 'C' キー入力に基づいて戦車の形状を変更します。
+ * @brief キー入力に基づいて戦車の形状を変更します。
  */
 void Player::HandleShapeChange()
 {
-    if (IsKeyPressedOnce('Z', m_wasZKeyPressed))
+    if (IsKeyPressedOnce(KEY_CHANGE_SHAPE_LEFT, m_wasZKeyPressed))
     {
         m_leftShape = GetNextShape(m_leftShape);
     }
-    if (IsKeyPressedOnce('X', m_wasXKeyPressed))
+    if (IsKeyPressedOnce(KEY_CHANGE_SHAPE_CENTER, m_wasXKeyPressed))
     {
         m_centerShape = GetNextShape(m_centerShape);
     }
-    if (IsKeyPressedOnce('C', m_wasCKeyPressed))
+    if (IsKeyPressedOnce(KEY_CHANGE_SHAPE_RIGHT, m_wasCKeyPressed))
     {
         m_rightShape = GetNextShape(m_rightShape);
     }
