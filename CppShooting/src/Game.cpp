@@ -65,8 +65,8 @@ void Game::UpdateObstacles()
             {
                 // X座標をランダムに決定し、画面上部から出現させる
                 float x = (rand() / (float)RAND_MAX) * 1.54f - 0.77f;
-                // Y座標をオブジェクトの大きさを考慮した値に修正 (修正箇所)
-                float y = 0.75f;
+                // Y座標を 0.0f から 0.75f の間のランダムな値に設定 (修正箇所)
+                float y = (rand() / (float)RAND_MAX) * 0.75f;
 
                 // 形状をランダムに決定
                 int shapeType = rand() % 3; // 0, 1, 2のいずれかの値
