@@ -39,11 +39,10 @@ Graphics::Graphics() :
     m_pVertexShader(nullptr),
     m_pPixelShader(nullptr),
     m_pVertexLayout(nullptr),
-    m_pVertexBuffer(nullptr),
     m_pConstantBuffer(nullptr),
-    m_pSquareBulletVertexBuffer(nullptr),
-    m_pTriangleBulletVertexBuffer(nullptr),
-    m_pPentagonBulletVertexBuffer(nullptr),
+    m_pSquareVertexBuffer(nullptr),
+    m_pTriangleVertexBuffer(nullptr),
+    m_pPentagonVertexBuffer(nullptr),
     m_pObstacleVertexBuffer(nullptr)
 {
 }
@@ -162,151 +161,76 @@ HRESULT Graphics::Initialize(HWND hWnd) {
     pVSBlob->Release();
     pPSBlob->Release();
 
-    // --- プレイヤーの頂点バッファ作成 (左から正方形、正三角形、正五角形) ---
+    // --- 弾と障害物、プレイヤーの各パーツの頂点バッファを作成 ---
+
+    // 1. 四角形 (青色)
     {
         SimpleVertex vertices[] = {
-            // 1. 左の正方形 (4頂点) - 青色
-            { { -0.14f, -0.04f, 0.5f }, { 0.2f, 0.2f, 0.8f, 1.0f } }, // 左下頂点
-            { { -0.14f,  0.04f, 0.5f }, { 0.2f, 0.2f, 0.8f, 1.0f } }, // 左上頂点
-            { { -0.06f, -0.04f, 0.5f }, { 0.2f, 0.2f, 0.8f, 1.0f } }, // 右下頂点
-            { { -0.06f,  0.04f, 0.5f }, { 0.2f, 0.2f, 0.8f, 1.0f } }, // 右上頂点
-
-            // 2. 中央の正三角形 (3頂点) - 赤色
-            { { -0.04f, -0.04f, 0.5f }, { 0.8f, 0.2f, 0.2f, 1.0f } }, // 左下頂点
-            { {  0.0f,   0.08f, 0.5f }, { 0.8f, 0.2f, 0.2f, 1.0f } }, // 上頂点
-            { {  0.04f, -0.04f, 0.5f }, { 0.8f, 0.2f, 0.2f, 1.0f } }, // 右下頂点
-
-            // 3. 右の正五角形 (3つの三角形で表現するため9頂点) - 緑色
-            // 五角形を3つの三角形に分割して表現
-            { { 0.07f, -0.04f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, { { 0.05f,  0.02f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, { { 0.1f,   0.08f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } },
-            { { 0.07f, -0.04f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, { { 0.1f,   0.08f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, { { 0.15f,  0.02f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } },
-            { { 0.07f, -0.04f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, { { 0.15f,  0.02f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, { { 0.13f, -0.04f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } },
+            { { -0.04f, -0.04f, 0.5f }, { 0.2f, 0.2f, 0.8f, 1.0f } }, // 左下
+            { { -0.04f,  0.04f, 0.5f }, { 0.2f, 0.2f, 0.8f, 1.0f } }, // 左上
+            { {  0.04f, -0.04f, 0.5f }, { 0.2f, 0.2f, 0.8f, 1.0f } }, // 右下
+            { {  0.04f,  0.04f, 0.5f }, { 0.2f, 0.2f, 0.8f, 1.0f } }  // 右上
         };
-
-        // プレイヤー用頂点バッファの設定
-        D3D11_BUFFER_DESC bd = {};
-        bd.Usage = D3D11_USAGE_DEFAULT;        // デフォルト使用法
-        bd.ByteWidth = sizeof(vertices);        // バッファサイズ
-        bd.BindFlags = D3D11_BIND_VERTEX_BUFFER; // 頂点バッファとして使用
-        D3D11_SUBRESOURCE_DATA InitData = { vertices };
-        hr = m_pd3dDevice->CreateBuffer(&bd, &InitData, &m_pVertexBuffer);
-        if (FAILED(hr)) {
-            // プレイヤー頂点バッファ作成に失敗
-            return hr;
-        }
-    }
-
-    // --- 弾の頂点バッファ作成 (形状ごと) ---
-
-    // 1. 四角形の弾 (青い戦車に対応 -> 青系の弾)
-    {
-        SimpleVertex vertices[] = {
-            // TRIANGLE_STRIP形式で四角形を定義
-            { { -BULLET_HALF_WIDTH, -BULLET_HALF_HEIGHT, 0.5f }, { 0.5f, 0.8f, 1.0f, 1.0f } }, // 左下
-            { { -BULLET_HALF_WIDTH,  BULLET_HALF_HEIGHT, 0.5f }, { 0.5f, 0.8f, 1.0f, 1.0f } }, // 左上
-            { {  BULLET_HALF_WIDTH, -BULLET_HALF_HEIGHT, 0.5f }, { 0.5f, 0.8f, 1.0f, 1.0f } }, // 右下
-            { {  BULLET_HALF_WIDTH,  BULLET_HALF_HEIGHT, 0.5f }, { 0.5f, 0.8f, 1.0f, 1.0f } }, // 右上
-        };
-
         D3D11_BUFFER_DESC bd = {};
         bd.Usage = D3D11_USAGE_DEFAULT;
         bd.ByteWidth = sizeof(vertices);
         bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
         D3D11_SUBRESOURCE_DATA InitData = { vertices };
-        hr = m_pd3dDevice->CreateBuffer(&bd, &InitData, &m_pSquareBulletVertexBuffer);
-        if (FAILED(hr)) {
-            // 四角形弾頂点バッファ作成に失敗
-            return hr;
-        }
+        hr = m_pd3dDevice->CreateBuffer(&bd, &InitData, &m_pSquareVertexBuffer);
+        if (FAILED(hr)) return hr;
     }
 
-    // 2. 三角形の弾 (赤い戦車に対応 -> 赤系の弾)
+    // 2. 三角形 (赤色)
     {
         SimpleVertex vertices[] = {
-            // 三角形の3頂点を定義
-            { { -0.015f, -0.015f, 0.5f }, { 1.0f, 0.6f, 0.6f, 1.0f } }, // 左下
-            { {  0.0f,    0.025f, 0.5f }, { 1.0f, 0.6f, 0.6f, 1.0f } }, // 上
-            { {  0.015f, -0.015f, 0.5f }, { 1.0f, 0.6f, 0.6f, 1.0f } }, // 右下
+            { { -0.04f, -0.04f, 0.5f }, { 0.8f, 0.2f, 0.2f, 1.0f } }, // 左下
+            { {  0.0f,   0.08f, 0.5f }, { 0.8f, 0.2f, 0.2f, 1.0f } }, // 上
+            { {  0.04f, -0.04f, 0.5f }, { 0.8f, 0.2f, 0.2f, 1.0f } }  // 右下
         };
-
         D3D11_BUFFER_DESC bd = {};
         bd.Usage = D3D11_USAGE_DEFAULT;
         bd.ByteWidth = sizeof(vertices);
         bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
         D3D11_SUBRESOURCE_DATA InitData = { vertices };
-        hr = m_pd3dDevice->CreateBuffer(&bd, &InitData, &m_pTriangleBulletVertexBuffer);
-        if (FAILED(hr)) {
-            // 三角形弾頂点バッファ作成に失敗
-            return hr;
-        }
+        hr = m_pd3dDevice->CreateBuffer(&bd, &InitData, &m_pTriangleVertexBuffer);
+        if (FAILED(hr)) return hr;
     }
 
-    // 3. 五角形の弾 (緑の戦車に対応 -> 緑系の弾)
+    // 3. 五角形 (緑色)
     {
-        // 五角形の5つの頂点を定義
         SimpleVertex pentagonVerts[] = {
-            { { 0.0f,    -0.02f, 0.5f }, { 0.6f, 1.0f, 0.6f, 1.0f } }, // 下
-            { {-0.019f, -0.006f, 0.5f }, { 0.6f, 1.0f, 0.6f, 1.0f } }, // 左下
-            { {-0.012f,  0.016f, 0.5f }, { 0.6f, 1.0f, 0.6f, 1.0f } }, // 左上
-            { { 0.012f,  0.016f, 0.5f }, { 0.6f, 1.0f, 0.6f, 1.0f } }, // 右上
-            { { 0.019f, -0.006f, 0.5f }, { 0.6f, 1.0f, 0.6f, 1.0f } }, // 右下
+            { { 0.0f,    -0.08f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, // 下
+            { {-0.076f, -0.025f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, // 左下
+            { {-0.047f,  0.065f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, // 左上
+            { { 0.047f,  0.065f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, // 右上
+            { { 0.076f, -0.025f, 0.5f }, { 0.2f, 0.8f, 0.2f, 1.0f } }, // 右下
         };
 
-        // TRIANGLE_LIST用に3つの三角形に分解
         SimpleVertex vertices[] = {
-             pentagonVerts[0], pentagonVerts[1], pentagonVerts[2], // 第1三角形
-             pentagonVerts[0], pentagonVerts[2], pentagonVerts[3], // 第2三角形
-             pentagonVerts[0], pentagonVerts[3], pentagonVerts[4]  // 第3三角形
+             pentagonVerts[0], pentagonVerts[1], pentagonVerts[2],
+             pentagonVerts[0], pentagonVerts[2], pentagonVerts[3],
+             pentagonVerts[0], pentagonVerts[3], pentagonVerts[4]
         };
-
         D3D11_BUFFER_DESC bd = {};
         bd.Usage = D3D11_USAGE_DEFAULT;
         bd.ByteWidth = sizeof(vertices);
         bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
         D3D11_SUBRESOURCE_DATA InitData = { vertices };
-        hr = m_pd3dDevice->CreateBuffer(&bd, &InitData, &m_pPentagonBulletVertexBuffer);
-        if (FAILED(hr)) {
-            // 五角形弾頂点バッファ作成に失敗
-            return hr;
-        }
+        hr = m_pd3dDevice->CreateBuffer(&bd, &InitData, &m_pPentagonVertexBuffer);
+        if (FAILED(hr)) return hr;
     }
 
-    // --- 障害物の頂点バッファ作成 ---
-    // 注意: 実際の障害物は弾の頂点バッファを再利用するため、これはダミー
-    {
-        SimpleVertex vertices[] = {
-            // ダミーの四角形データ（グレー色）
-            { { -0.05f, -0.05f, 0.5f }, { 0.5f, 0.5f, 0.5f, 1.0f } },
-            { { -0.05f,  0.05f, 0.5f }, { 0.5f, 0.5f, 0.5f, 1.0f } },
-            { {  0.05f, -0.05f, 0.5f }, { 0.5f, 0.5f, 0.5f, 1.0f } },
-            { {  0.05f,  0.05f, 0.5f }, { 0.5f, 0.5f, 0.5f, 1.0f } }
-        };
-
-        D3D11_BUFFER_DESC bd = {};
-        bd.Usage = D3D11_USAGE_DEFAULT;
-        bd.ByteWidth = sizeof(SimpleVertex) * 4;
-        bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-        D3D11_SUBRESOURCE_DATA InitData = { vertices };
-        // m_pObstacleVertexBuffer はもう使わないが、解放処理のために残しておく
-        hr = m_pd3dDevice->CreateBuffer(&bd, &InitData, &m_pObstacleVertexBuffer);
-        if (FAILED(hr)) {
-            // 障害物頂点バッファ作成に失敗
-            return hr;
-        }
-    }
+    // --- 障害物用の頂点バッファは、弾のバッファを再利用するため、ここでは作成しない ---
 
     // --- 定数バッファの作成 ---
     {
         D3D11_BUFFER_DESC cbd = {};
-        cbd.Usage = D3D11_USAGE_DYNAMIC;           // 動的使用法（CPU書き込み可能）
-        cbd.ByteWidth = sizeof(ConstantBuffer);     // 定数バッファのサイズ
-        cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER; // 定数バッファとして使用
-        cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE; // CPU書き込みアクセス許可
+        cbd.Usage = D3D11_USAGE_DYNAMIC;
+        cbd.ByteWidth = sizeof(ConstantBuffer);
+        cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+        cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
         hr = m_pd3dDevice->CreateBuffer(&cbd, nullptr, &m_pConstantBuffer);
-        if (FAILED(hr)) {
-            // 定数バッファ作成に失敗
-            return hr;
-        }
+        if (FAILED(hr)) return hr;
     }
 
     return S_OK;
@@ -317,66 +241,19 @@ HRESULT Graphics::Initialize(HWND hWnd) {
  * @details すべてのCOMインターフェースを安全に解放
  */
 void Graphics::Shutdown() {
-    // デバイスコンテキストの状態をクリア
     if (m_pImmediateContext) m_pImmediateContext->ClearState();
-
-    // 各リソースを安全に解放（nullptrチェック付き）
-    if (m_pObstacleVertexBuffer) {
-        m_pObstacleVertexBuffer->Release();
-        m_pObstacleVertexBuffer = nullptr;
-    }
-
-    // --- 弾の頂点バッファの解放処理 ---
-    if (m_pPentagonBulletVertexBuffer) {
-        m_pPentagonBulletVertexBuffer->Release();
-        m_pPentagonBulletVertexBuffer = nullptr;
-    }
-    if (m_pTriangleBulletVertexBuffer) {
-        m_pTriangleBulletVertexBuffer->Release();
-        m_pTriangleBulletVertexBuffer = nullptr;
-    }
-    if (m_pSquareBulletVertexBuffer) {
-        m_pSquareBulletVertexBuffer->Release();
-        m_pSquareBulletVertexBuffer = nullptr;
-    }
-
-    // その他のリソース解放
-    if (m_pConstantBuffer) {
-        m_pConstantBuffer->Release();
-        m_pConstantBuffer = nullptr;
-    }
-    if (m_pVertexBuffer) {
-        m_pVertexBuffer->Release();
-        m_pVertexBuffer = nullptr;
-    }
-    if (m_pVertexLayout) {
-        m_pVertexLayout->Release();
-        m_pVertexLayout = nullptr;
-    }
-    if (m_pVertexShader) {
-        m_pVertexShader->Release();
-        m_pVertexShader = nullptr;
-    }
-    if (m_pPixelShader) {
-        m_pPixelShader->Release();
-        m_pPixelShader = nullptr;
-    }
-    if (m_pRenderTargetView) {
-        m_pRenderTargetView->Release();
-        m_pRenderTargetView = nullptr;
-    }
-    if (m_pSwapChain) {
-        m_pSwapChain->Release();
-        m_pSwapChain = nullptr;
-    }
-    if (m_pImmediateContext) {
-        m_pImmediateContext->Release();
-        m_pImmediateContext = nullptr;
-    }
-    if (m_pd3dDevice) {
-        m_pd3dDevice->Release();
-        m_pd3dDevice = nullptr;
-    }
+    if (m_pObstacleVertexBuffer) { m_pObstacleVertexBuffer->Release(); m_pObstacleVertexBuffer = nullptr; }
+    if (m_pPentagonVertexBuffer) { m_pPentagonVertexBuffer->Release(); m_pPentagonVertexBuffer = nullptr; }
+    if (m_pTriangleVertexBuffer) { m_pTriangleVertexBuffer->Release(); m_pTriangleVertexBuffer = nullptr; }
+    if (m_pSquareVertexBuffer) { m_pSquareVertexBuffer->Release(); m_pSquareVertexBuffer = nullptr; }
+    if (m_pConstantBuffer) { m_pConstantBuffer->Release(); m_pConstantBuffer = nullptr; }
+    if (m_pVertexLayout) { m_pVertexLayout->Release(); m_pVertexLayout = nullptr; }
+    if (m_pVertexShader) { m_pVertexShader->Release(); m_pVertexShader = nullptr; }
+    if (m_pPixelShader) { m_pPixelShader->Release(); m_pPixelShader = nullptr; }
+    if (m_pRenderTargetView) { m_pRenderTargetView->Release(); m_pRenderTargetView = nullptr; }
+    if (m_pSwapChain) { m_pSwapChain->Release(); m_pSwapChain = nullptr; }
+    if (m_pImmediateContext) { m_pImmediateContext->Release(); m_pImmediateContext = nullptr; }
+    if (m_pd3dDevice) { m_pd3dDevice->Release(); m_pd3dDevice = nullptr; }
 }
 
 /**
@@ -385,23 +262,19 @@ void Graphics::Shutdown() {
  * @details 画面クリア、各オブジェクトの描画、画面表示を実行
  */
 void Graphics::RenderFrame(const Game& game) {
-    // 画面を濃い青色でクリア
     float ClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f }; // R, G, B, A
     m_pImmediateContext->ClearRenderTargetView(m_pRenderTargetView, ClearColor);
 
-    // 描画パイプラインの設定
-    m_pImmediateContext->IASetInputLayout(m_pVertexLayout);         // 入力レイアウト設定
-    m_pImmediateContext->VSSetShader(m_pVertexShader, nullptr, 0);  // 頂点シェーダー設定
-    m_pImmediateContext->PSSetShader(m_pPixelShader, nullptr, 0);   // ピクセルシェーダー設定
-    m_pImmediateContext->VSSetConstantBuffers(0, 1, &m_pConstantBuffer); // 定数バッファ設定
+    m_pImmediateContext->IASetInputLayout(m_pVertexLayout);
+    m_pImmediateContext->VSSetShader(m_pVertexShader, nullptr, 0);
+    m_pImmediateContext->PSSetShader(m_pPixelShader, nullptr, 0);
+    m_pImmediateContext->VSSetConstantBuffers(0, 1, &m_pConstantBuffer);
 
-    // 各オブジェクトを描画
     const Player& player = game.getPlayer();
-    RenderPlayer(player.GetX(), player.GetY()); // プレイヤー描画
-    RenderBullets(game);                        // 弾描画
-    RenderObstacles(game);                      // 障害物描画
+    RenderPlayer(player.GetX(), player.GetY(), player.GetLeftShape(), player.GetCenterShape(), player.GetRightShape());
+    RenderBullets(game);
+    RenderObstacles(game);
 
-    // バックバッファを画面に表示（垂直同期有効）
     m_pSwapChain->Present(1, 0);
 }
 
@@ -409,90 +282,40 @@ void Graphics::RenderFrame(const Game& game) {
  * @brief プレイヤーを描画します。
  * @param x プレイヤーのX座標
  * @param y プレイヤーのY座標
- * @details プレイヤーは3つのパーツ（正方形、三角形、五角形）から構成
+ * @param leftShape 左の戦車の形状
+ * @param centerShape 真ん中の戦車の形状
+ * @param rightShape 右の戦車の形状
  */
-void Graphics::RenderPlayer(float x, float y)
+void Graphics::RenderPlayer(float x, float y, BulletShape leftShape, BulletShape centerShape, BulletShape rightShape)
 {
-    // 定数バッファを更新してプレイヤーの座標をシェーダーに渡す
-    D3D11_MAPPED_SUBRESOURCE mappedResource;
-    m_pImmediateContext->Map(m_pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-    ConstantBuffer* cb = (ConstantBuffer*)mappedResource.pData;
-    cb->x_offset = x;    // X方向オフセット
-    cb->y_offset = y;    // Y方向オフセット
-    cb->scale = 1.0f;    // プレイヤーの倍率は1.0で固定
-    m_pImmediateContext->Unmap(m_pConstantBuffer, 0);
+    // 各パーツの位置オフセット
+    float leftX = x - 0.1f;
+    float leftY = y + 0.06f;
 
-    // プレイヤーの頂点バッファを設定
-    UINT stride = sizeof(SimpleVertex); // 頂点サイズ
-    UINT offset = 0;                    // オフセット
-    m_pImmediateContext->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
+    float centerX = x;
+    float centerY = y + 0.1f;
+
+    float rightX = x + 0.1f;
+    float rightY = y + 0.06f;
 
     // 各パーツを描画
-
-    // 1. 左の正方形 (頂点インデックス0から4頂点)
-    m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-    m_pImmediateContext->Draw(4, 0); // 4頂点、開始インデックス0
-
-    // 2. 中央の正三角形 (頂点インデックス4から3頂点)
-    m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    m_pImmediateContext->Draw(3, 4); // 3頂点、開始インデックス4
-
-    // 3. 右の正五角形 (頂点インデックス7から9頂点 = 3つの三角形)
-    m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    m_pImmediateContext->Draw(9, 7); // 9頂点、開始インデックス7
+    DrawShape(leftShape, leftX, leftY, 1.0f);
+    DrawShape(centerShape, centerX, centerY, 1.0f);
+    DrawShape(rightShape, rightX, rightY, 1.0f);
 }
 
 /**
  * @brief すべての有効な弾を描画します。
  * @param game ゲーム状態オブジェクトの参照
- * @details 各弾の形状に応じて適切な頂点バッファと描画方法を選択
  */
 void Graphics::RenderBullets(const Game& game)
 {
-    UINT stride = sizeof(SimpleVertex);
-    UINT offset = 0;
-
-    // ゲームから弾の配列を取得
     const Bullet* bullets = game.getBullets();
-
-    // すべての弾をチェックして、アクティブなもののみ描画
     for (int i = 0; i < game.getMaxBullets(); ++i)
     {
         if (bullets[i].IsActive())
         {
-            // 定数バッファに弾の座標を書き込む
-            D3D11_MAPPED_SUBRESOURCE mappedResource;
-            m_pImmediateContext->Map(m_pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-            ConstantBuffer* cb = (ConstantBuffer*)mappedResource.pData;
-            cb->x_offset = bullets[i].GetX(); // 弾のX座標
-            cb->y_offset = bullets[i].GetY(); // 弾のY座標
-            cb->scale = 1.0f;                 // 弾の倍率は1.0で固定
-            m_pImmediateContext->Unmap(m_pConstantBuffer, 0);
-
-            // 弾の形状に応じて、使用する頂点バッファと描画方法を切り替える
-            switch (bullets[i].GetShape())
-            {
-            case BulletShape::Square:
-                // 四角形の弾を描画
-                m_pImmediateContext->IASetVertexBuffers(0, 1, &m_pSquareBulletVertexBuffer, &stride, &offset);
-                m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-                m_pImmediateContext->Draw(4, 0); // 4頂点で四角形を描画
-                break;
-
-            case BulletShape::Triangle:
-                // 三角形の弾を描画
-                m_pImmediateContext->IASetVertexBuffers(0, 1, &m_pTriangleBulletVertexBuffer, &stride, &offset);
-                m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-                m_pImmediateContext->Draw(3, 0); // 3頂点で三角形を描画
-                break;
-
-            case BulletShape::Pentagon:
-                // 五角形の弾を描画
-                m_pImmediateContext->IASetVertexBuffers(0, 1, &m_pPentagonBulletVertexBuffer, &stride, &offset);
-                m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-                m_pImmediateContext->Draw(9, 0); // 9頂点(3つの三角形)で五角形を描画
-                break;
-            }
+            DrawShape(bullets[i].GetShape(), bullets[i].GetX(), bullets[i].GetY(), 0.2f);
         }
     }
 }
@@ -500,55 +323,55 @@ void Graphics::RenderBullets(const Game& game)
 /**
  * @brief すべての有効な障害物を描画します。
  * @param game ゲーム状態オブジェクトの参照
- * @details 障害物は弾と同じ形状を使用し、OBSTACLE_SCALEで拡大される
  */
 void Graphics::RenderObstacles(const Game& game)
 {
-    UINT stride = sizeof(SimpleVertex);
-    UINT offset = 0;
-
-    // ゲームから障害物の配列を取得
     const Obstacle* obstacles = game.getObstacles();
-
-    // すべての障害物をチェックして、アクティブなもののみ描画
     for (int i = 0; i < game.getMaxObstacles(); ++i)
     {
         if (obstacles[i].IsActive())
         {
-            // 定数バッファに障害物の座標とスケールを書き込む
-            D3D11_MAPPED_SUBRESOURCE mappedResource;
-            m_pImmediateContext->Map(m_pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-            ConstantBuffer* cb = (ConstantBuffer*)mappedResource.pData;
-            cb->x_offset = obstacles[i].GetX(); // 障害物のX座標
-            cb->y_offset = obstacles[i].GetY(); // 障害物のY座標
-            cb->scale = OBSTACLE_SCALE;         // GameConfig.hから読み込んだ倍率を設定
-            m_pImmediateContext->Unmap(m_pConstantBuffer, 0);
-
-            // 障害物の形状に応じて、使用する頂点バッファと描画方法を切り替える
-            // 注意: 障害物は弾と同じ頂点バッファを再利用
-            switch (obstacles[i].GetShape())
-            {
-            case BulletShape::Square:
-                // 四角形の障害物を描画
-                m_pImmediateContext->IASetVertexBuffers(0, 1, &m_pSquareBulletVertexBuffer, &stride, &offset);
-                m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-                m_pImmediateContext->Draw(4, 0);
-                break;
-
-            case BulletShape::Triangle:
-                // 三角形の障害物を描画
-                m_pImmediateContext->IASetVertexBuffers(0, 1, &m_pTriangleBulletVertexBuffer, &stride, &offset);
-                m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-                m_pImmediateContext->Draw(3, 0);
-                break;
-
-            case BulletShape::Pentagon:
-                // 五角形の障害物を描画
-                m_pImmediateContext->IASetVertexBuffers(0, 1, &m_pPentagonBulletVertexBuffer, &stride, &offset);
-                m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-                m_pImmediateContext->Draw(9, 0);
-                break;
-            }
+            DrawShape(obstacles[i].GetShape(), obstacles[i].GetX(), obstacles[i].GetY(), OBSTACLE_SCALE);
         }
+    }
+}
+
+/**
+ * @brief 指定された形状を描画します。
+ * @param shape 描画する形状
+ * @param xOffset X座標のオフセット
+ * @param yOffset Y座標のオフセット
+ * @param scale 拡大率
+ */
+void Graphics::DrawShape(BulletShape shape, float xOffset, float yOffset, float scale)
+{
+    D3D11_MAPPED_SUBRESOURCE mappedResource;
+    m_pImmediateContext->Map(m_pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+    ConstantBuffer* cb = (ConstantBuffer*)mappedResource.pData;
+    cb->x_offset = xOffset;
+    cb->y_offset = yOffset;
+    cb->scale = scale;
+    m_pImmediateContext->Unmap(m_pConstantBuffer, 0);
+
+    UINT stride = sizeof(SimpleVertex);
+    UINT offset = 0;
+
+    switch (shape)
+    {
+    case BulletShape::Square:
+        m_pImmediateContext->IASetVertexBuffers(0, 1, &m_pSquareVertexBuffer, &stride, &offset);
+        m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+        m_pImmediateContext->Draw(4, 0);
+        break;
+    case BulletShape::Triangle:
+        m_pImmediateContext->IASetVertexBuffers(0, 1, &m_pTriangleVertexBuffer, &stride, &offset);
+        m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        m_pImmediateContext->Draw(3, 0);
+        break;
+    case BulletShape::Pentagon:
+        m_pImmediateContext->IASetVertexBuffers(0, 1, &m_pPentagonVertexBuffer, &stride, &offset);
+        m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        m_pImmediateContext->Draw(9, 0);
+        break;
     }
 }
