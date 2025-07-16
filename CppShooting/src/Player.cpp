@@ -148,11 +148,11 @@ BulletShape Player::GetNextShape(BulletShape currentShape)
     switch (currentShape)
     {
     case BulletShape::Square:
-        return BulletShape::Triangle;
-    case BulletShape::Triangle:
         return BulletShape::Pentagon;
-    case BulletShape::Pentagon:
+    case BulletShape::Triangle:
         return BulletShape::Square;
+    case BulletShape::Pentagon:
+        return BulletShape::Triangle;
     default:
         return BulletShape::Square; // 不明な形状の場合はデフォルトに戻す
     }
