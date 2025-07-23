@@ -26,6 +26,9 @@ void Game::Update()
     UpdateBullets();   // 弾の移動を処理
     UpdateObstacles(); // 障害物の出現を処理
     CheckCollisions(); // 衝突判定を処理
+    for (int i = 0; i < MAX_OBSTACLES; i++) {
+		m_obstacles[i].Update(m_obstacleBullets); // 障害物の状態を更新
+    }
 }
 
 /**
@@ -40,6 +43,18 @@ void Game::UpdateBullets()
         if (m_bullets[i].IsActive())
         {
             m_bullets[i].Update();
+        }
+    }
+}
+
+void Game::UpdateObstacleBullets()
+{
+    // すべての障害物の弾の位置を更新
+    for (int i = 0; i < MAX_OBSTACLE_BULLETS; ++i)
+    {
+        if (m_obstacleBullets[i].IsActive())
+        {
+            m_obstacleBullets[i].Update();
         }
     }
 }
@@ -121,5 +136,26 @@ void Game::CheckCollisions()
                 }
             }
         }
+    }
+}
+
+void Game::CheckObstacleBulletCollisions()
+{
+    for (int i = 0; i < MAX_OBSTACLE_BULLETS;i++) {
+        if (!m_obstacleBullets[i].IsActive())continue;
+        // 弾と障害物の距離を計算 (三平方の定理)
+        float dx = m_obstacleBullets[i].GetX() - m_player.GetX();
+        float dy = m_obstacleBullets[i].GetY() - m_player.GetY();
+        float dist_squared = dx * dx + dy * dy; // 平方根の計算を省略するため、距離の2乗で比較
+
+        // 当たり判定の半径 (の2乗) より距離が小さければ衝突
+        if (dist_squared < OBSTACLE_COLLISION_RADIUS * OBSTACLE_COLLISION_RADIUS)
+        {
+            m_obstacleBullets[i].Deactivate();  // 弾を消す
+            m_player.Hit();       // プレイヤーのHPを減らす
+            
+        }
+
+
     }
 }

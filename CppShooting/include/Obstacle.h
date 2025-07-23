@@ -1,5 +1,7 @@
 #pragma once
 #include "Bullet.h" // BulletShapeを共有するためインクルード
+#include "ObstacleBullet.h"
+
 
 /**
  * @class Obstacle
@@ -57,10 +59,14 @@ public:
      */
     BulletShape GetShape() const { return m_shape; }
 
+	void Update(ObstacleBullet* obstacleBullets);
+    void HandleShooting(ObstacleBullet* obstacleBullets, int maxObstacleBullets);
+
 private:
     bool        m_isActive; // 障害物が有効かどうかのフラグ
     float       m_x;        // X座標
     float       m_y;        // Y座標
     int         m_hp;       // ヒットポイント（耐久値）
     BulletShape m_shape;    // 障害物の形状
+    float m_obstacleFireCooldown;       // 弾の発射クールダウンタイマー
 };

@@ -158,3 +158,9 @@ BulletShape Player::GetNextShape(BulletShape currentShape)
         return BulletShape::Square; // 不明な形状の場合はデフォルトに戻す
     }
 }
+
+void Player::Hit()
+{
+    // プレイヤーがダメージを受けた場合の処理
+    // ここでは特に何もしないが、必要に応じてHPを減らすなどの処理を追加可能
+}

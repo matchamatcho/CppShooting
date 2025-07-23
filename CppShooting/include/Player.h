@@ -53,6 +53,8 @@ public:
      */
     BulletShape GetRightShape() const { return m_rightShape; }
 
+    void Hit();
+
 
 private:
     /**
