@@ -24,6 +24,7 @@
     <ClCompile Include="src\Graphics.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Obstacle.cpp" />
+    <ClCompile Include="src\ObstacleBullet.cpp" />
     <ClCompile Include="src\Player.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -32,6 +33,7 @@
     <ClInclude Include="include\GameConfig.h" />
     <ClInclude Include="include\Graphics.h" />
     <ClInclude Include="include\Obstacle.h" />
+    <ClInclude Include="include\ObstacleBullet.h" />
     <ClInclude Include="include\Player.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

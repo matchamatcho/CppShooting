@@ -2,7 +2,7 @@
 #include "Bullet.h"
 #include "Obstacle.h"
 #include "Player.h"   // Playerクラスをインクルード
-
+#include "GameConfig.h" // ゲーム設定をインクルード
 // クラスの前方宣言
 class Bullet;
 class Obstacle;
@@ -36,11 +36,11 @@ private:
     Player m_player; // プレイヤーオブジェクト
 
     // --- 弾の管理 ---
-    static const int MAX_BULLETS = 50;
+    
     Bullet m_bullets[MAX_BULLETS];
 
     // --- 障害物の管理 ---
-    static const int MAX_OBSTACLES = 10;
+    
     Obstacle m_obstacles[MAX_OBSTACLES];
     float m_obstacleSpawnTimer;
 
