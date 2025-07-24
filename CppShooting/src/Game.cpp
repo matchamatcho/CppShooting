@@ -26,6 +26,8 @@ void Game::Update()
     UpdateBullets();   // 弾の移動を処理
     UpdateObstacles(); // 障害物の出現を処理
     CheckCollisions(); // 衝突判定を処理
+    UpdateObstacleBullets(); // 障害物の弾の移動を処理
+    CheckObstacleBulletCollisions(); // 障害物の弾とプレイヤーの衝突判定を処理
 }
 
 /**
@@ -34,12 +36,28 @@ void Game::Update()
  */
 void Game::UpdateBullets()
 {
+
     // すべての弾の位置を更新
     for (int i = 0; i < MAX_BULLETS; ++i)
     {
         if (m_bullets[i].IsActive())
         {
             m_bullets[i].Update();
+        }
+    }
+}
+
+void Game::UpdateObstacleBullets()
+{
+    //OutputDebugStringA("あいうえｒ\n");
+
+    // すべての障害物の弾の位置を更新
+    for (int i = 0; i < MAX_OBSTACLE_BULLETS; ++i)
+    {
+        if (m_obstacleBullets[i].IsActive())
+        {
+            m_obstacleBullets[i].Update();
+            //OutputDebugStringA("m_obstacleBullets[i].Update()\n");
         }
     }
 }
@@ -51,7 +69,7 @@ void Game::UpdateBullets()
 void Game::UpdateObstacles()
 {
     // 障害物出現タイマーを減らす
-    m_obstacleSpawnTimer -= 0.05f;
+    m_obstacleSpawnTimer -= OBSTACLE_SPAWN_TIMER_DECREMENT;
 
     // タイマーが0になったら新しい障害物を出現させる
     if (m_obstacleSpawnTimer <= 0.0f)
@@ -64,12 +82,12 @@ void Game::UpdateObstacles()
             if (!m_obstacles[i].IsActive())
             {
                 // X座標をランダムに決定し、画面上部から出現させる
-                float x = (rand() / (float)RAND_MAX) * 1.54f - 0.77f;
-                // Y座標を 0.0f から 0.75f の間のランダムな値に設定 (修正箇所)
-                float y = (rand() / (float)RAND_MAX) * 0.75f;
+                float x = (rand() / (float)RAND_MAX) * OBSTACLE_SPAWN_X_RANGE - OBSTACLE_SPAWN_X_OFFSET;
+                // Y座標を 0.0f からのランダムな値に設定
+                float y = (rand() / (float)RAND_MAX) * OBSTACLE_SPAWN_Y_RANGE;
 
                 // 形状をランダムに決定
-                int shapeType = rand() % 3; // 0, 1, 2のいずれかの値
+                int shapeType = rand() % NUM_SHAPE_TYPES; // 0, 1, 2のいずれかの値
                 BulletShape shape;
                 switch (shapeType) {
                 case 0:
@@ -87,7 +105,18 @@ void Game::UpdateObstacles()
                 m_obstacles[i].Activate(x, y, OBSTACLE_DEFAULT_HP, shape);
                 break; // 1つ出現させたらループを抜ける
             }
+
         }
+    }
+
+    for (int i = 0; i < MAX_OBSTACLES; ++i)
+    {
+        if (m_obstacles[i].IsActive())
+        {
+            m_obstacles[i].Update(m_obstacleBullets); // 障害物の弾の位置を更新
+
+        }
+
     }
 }
 
@@ -121,5 +150,29 @@ void Game::CheckCollisions()
                 }
             }
         }
+    }
+}
+
+void Game::CheckObstacleBulletCollisions()
+{
+    for (int i = 0; i < MAX_OBSTACLE_BULLETS; i++) {
+        if (!m_obstacleBullets[i].IsActive())continue;
+        // 弾と障害物の距離を計算 (三平方の定理)
+        float dx = m_obstacleBullets[i].GetX() - m_player.GetX();
+        float dy = m_obstacleBullets[i].GetY() - m_player.GetY();
+        float dist_squared = dx * dx + dy * dy; // 平方根の計算を省略するため、距離の2乗で比較
+        /*char debugStr[256];
+        snprintf(debugStr, sizeof(debugStr), "Collision Check: dx=%.2f, dy=%.2f, player hit!\n", dx, dy);
+        OutputDebugStringA(debugStr);*/
+
+        // 当たり判定の半径 (の2乗) より距離が小さければ衝突
+        if (dist_squared < OBSTACLEBULLET_COLLISION_RADIUS * OBSTACLEBULLET_COLLISION_RADIUS)
+        {
+            m_obstacleBullets[i].Deactivate();  // 弾を消す
+            m_player.Hit();       // プレイヤーのHPを減らす
+
+        }
+
+
     }
 }

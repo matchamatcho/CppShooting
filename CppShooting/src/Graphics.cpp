@@ -274,6 +274,7 @@ void Graphics::RenderFrame(const Game& game) {
     RenderPlayer(player.GetX(), player.GetY(), player.GetLeftShape(), player.GetCenterShape(), player.GetRightShape());
     RenderBullets(game);
     RenderObstacles(game);
+	RenderObstacleBullets(game);
 
     m_pSwapChain->Present(1, 0);
 }
@@ -316,6 +317,22 @@ void Graphics::RenderBullets(const Game& game)
         if (bullets[i].IsActive())
         {
             DrawShape(bullets[i].GetShape(), bullets[i].GetX(), bullets[i].GetY(), 0.2f);
+        }
+    }
+}
+
+/**
+ * @brief すべての有効な弾を描画します。
+ * @param game ゲーム状態オブジェクトの参照
+ */
+void Graphics::RenderObstacleBullets(const Game& game)
+{
+    const ObstacleBullet* obstacleBullets = game.getObstacleBullets();
+    for (int i = 0; i < game.getMaxBullets(); ++i)
+    {
+        if (obstacleBullets[i].IsActive())
+        {
+            DrawShape(obstacleBullets[i].GetShape(), obstacleBullets[i].GetX(), obstacleBullets[i].GetY(), 0.2f);
         }
     }
 }

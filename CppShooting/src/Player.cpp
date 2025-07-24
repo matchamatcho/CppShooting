@@ -26,7 +26,7 @@ void Player::Update(Bullet* bullets, int maxBullets)
 {
     // クールダウンタイマーを更新
     if (m_fireCooldown > 0.0f) {
-        m_fireCooldown -= 0.1f;
+        m_fireCooldown -= FRAME_RATE_INVERSE;
     }
 
     // 移動処理
@@ -53,12 +53,11 @@ void Player::HandleMovement()
     if (GetAsyncKeyState(KEY_MOVE_LEFT) & 0x8000) m_x -= PLAYER_MOVE_SPEED;
     if (GetAsyncKeyState(KEY_MOVE_RIGHT) & 0x8000) m_x += PLAYER_MOVE_SPEED;
 
-    // プレイヤーが画面外に出ないように座標を制限 (修正箇所)
-    // プレイヤーの最大の幅と高さを考慮した値に変更
-    if (m_x > 0.82f) m_x = 0.82f;
-    if (m_x < -0.82f) m_x = -0.82f;
-    if (m_y > 0.82f) m_y = 0.82f;
-    if (m_y < -0.98f) m_y = -0.98f;
+    // プレイヤーが画面外に出ないように座標を制限
+    if (m_x > PLAYER_MAX_X) m_x = PLAYER_MAX_X;
+    if (m_x < PLAYER_MIN_X) m_x = PLAYER_MIN_X;
+    if (m_y > PLAYER_MAX_Y) m_y = PLAYER_MAX_Y;
+    if (m_y < PLAYER_MIN_Y) m_y = PLAYER_MIN_Y;
 }
 
 /**
@@ -69,6 +68,7 @@ void Player::HandleFireToggle()
     if (IsKeyPressedOnce(KEY_TOGGLE_AUTOFIRE, m_wasSpaceKeyPressed))
     {
         m_isAutoFireEnabled = !m_isAutoFireEnabled; // bool値を反転させる
+        PlaySound(TEXT("assets/sounds/shoot.wav"), NULL, SND_FILENAME | SND_ASYNC);
     }
 }
 
@@ -108,6 +108,7 @@ void Player::HandleShooting(Bullet* bullets, int maxBullets)
         int numBulletsToFire = 3;
 
         int bulletsFired = 0;
+
         // 非アクティブな弾を探して発射する
         for (int i = 0; i < maxBullets && bulletsFired < numBulletsToFire; ++i)
         {
@@ -157,4 +158,10 @@ BulletShape Player::GetNextShape(BulletShape currentShape)
     default:
         return BulletShape::Square; // 不明な形状の場合はデフォルトに戻す
     }
+}
+
+void Player::Hit()
+{
+    // プレイヤーがダメージを受けた場合の処理
+    // ここでは特に何もしないが、必要に応じてHPを減らすなどの処理を追加可能
 }
