@@ -6,6 +6,10 @@
 // --- ƒvƒŒƒCƒ„[ŠÖ˜A ---
 const float PLAYER_MOVE_SPEED = 0.02f;      // ƒvƒŒƒCƒ„[‚ÌˆÚ“®‘¬“x
 const float PLAYER_FIRE_COOLDOWN = 1.0f;    // ’e‚Ì”­ŽËƒN[ƒ‹ƒ_ƒEƒ“ŽžŠÔ (’l‚ª¬‚³‚¢‚Ù‚Ç˜AŽË‘¬“x‚ªã‚ª‚é)
+const float PLAYER_MAX_X = 0.82f;           // ƒvƒŒƒCƒ„[‚ÌÅ‘åXÀ•W
+const float PLAYER_MIN_X = -0.82f;          // ƒvƒŒƒCƒ„[‚ÌÅ¬XÀ•W
+const float PLAYER_MAX_Y = 0.82f;           // ƒvƒŒƒCƒ„[‚ÌÅ‘åYÀ•W
+const float PLAYER_MIN_Y = -0.98f;          // ƒvƒŒƒCƒ„[‚ÌÅ¬YÀ•W
 
 // --- ’eŠÖ˜A ---
 const float BULLET_HALF_WIDTH = 0.005f;     // ’e‚Ì•‚Ì”¼•ª
@@ -17,6 +21,10 @@ const float OBSTACLE_FIRE_COOLDOWN = 3.1f;    // ’e‚Ì”­ŽËƒN[ƒ‹ƒ_ƒEƒ“ŽžŠÔ (’l‚ª
 
 // --- áŠQ•¨ŠÖ˜A ---
 const float OBSTACLE_SPAWN_INTERVAL = 3.4f; // áŠQ•¨‚ªŽŸ‚ÉoŒ»‚·‚é‚Ü‚Å‚ÌŽžŠÔ
+const float OBSTACLE_SPAWN_TIMER_DECREMENT = 0.05f; // áŠQ•¨oŒ»ƒ^ƒCƒ}[‚ÌŒ¸­—Ê
+const float OBSTACLE_SPAWN_X_RANGE = 1.54f; // áŠQ•¨‚ÌoŒ»XÀ•W”ÍˆÍ
+const float OBSTACLE_SPAWN_X_OFFSET = 0.77f; // áŠQ•¨‚ÌoŒ»XÀ•WƒIƒtƒZƒbƒg
+const float OBSTACLE_SPAWN_Y_RANGE = 0.75f;  // áŠQ•¨‚ÌoŒ»YÀ•W”ÍˆÍ
 const int   OBSTACLE_DEFAULT_HP = 3;         // áŠQ•¨‚Ì‰ŠúHP
 const float OBSTACLE_COLLISION_RADIUS = 0.05f; // áŠQ•¨‚Æ‚Ì“–‚½‚è”»’è‚Ì”¼Œa
 const float OBSTACLEBULLET_COLLISION_RADIUS = 0.25f; // ƒvƒŒƒCƒ„[‚Æ‚Ì’e‚Ì“–‚½‚è”»’è‚Ì”¼Œa
@@ -29,16 +37,15 @@ const float OBSTACLE_BULLET_SPAWN_OFFSET = 0.05f; // áŠQ•¨‚Ì’e‚Ì”­ŽËˆÊ’uƒIƒtƒZƒ
 const float OBSTACLE_BULLET_SPAWN_Y_OFFSET = 0.1f; // áŠQ•¨‚Ì’e‚ÌYˆÊ’uƒIƒtƒZƒbƒg
 const float OBSTACLE_BULLET_SPAWN_X_OFFSET = 0.1f; // áŠQ•¨‚Ì’e‚ÌXˆÊ’uƒIƒtƒZƒbƒg
 const int MAX_OBSTACLES = 10;
+const int NUM_SHAPE_TYPES = 3; // Œ`ó‚ÌŽí—Þ”
+
 // --- ƒQ[ƒ€ŠÖ˜A ---
 const float GAME_UPDATE_INTERVAL = 0.016f; // ƒQ[ƒ€‚ÌXVŠÔŠu (–ñ60FPS)
+const float FRAME_RATE_INVERSE = 0.1f; // 1ƒtƒŒ[ƒ€‚ ‚½‚è‚ÌŽžŠÔiƒN[ƒ‹ƒ_ƒEƒ“‚È‚Ç‚ÅŽg—pj
 const float GAME_OVER_DELAY = 3.0f;       // ƒQ[ƒ€ƒI[ƒo[‰æ–Ê‚Ì•\Ž¦ŽžŠÔ
 const float GAME_START_DELAY = 1.0f;      // ƒQ[ƒ€ŠJŽn‘O‚Ì‘Ò‹@ŽžŠÔ
 const float GAME_PAUSE_DELAY = 0.5f;      // ƒQ[ƒ€ˆêŽž’âŽ~‚Ì‘Ò‹@ŽžŠÔ
 const float GAME_SCORE_UPDATE_INTERVAL = 1.0f; // ƒXƒRƒAXV‚ÌŠÔŠu
-
-
-
-
 
 // ============== ƒL[ƒoƒCƒ“ƒhÝ’è ================
 // ƒQ[ƒ€‚Ì‘€ìƒL[‚ðÝ’è‚µ‚Ü‚·B
