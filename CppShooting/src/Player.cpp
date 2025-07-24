@@ -69,6 +69,7 @@ void Player::HandleFireToggle()
     if (IsKeyPressedOnce(KEY_TOGGLE_AUTOFIRE, m_wasSpaceKeyPressed))
     {
         m_isAutoFireEnabled = !m_isAutoFireEnabled; // bool値を反転させる
+        PlaySound(TEXT("assets/sounds/shoot.wav"), NULL, SND_FILENAME | SND_ASYNC);
     }
 }
 
@@ -108,6 +109,8 @@ void Player::HandleShooting(Bullet* bullets, int maxBullets)
         int numBulletsToFire = 3;
 
         int bulletsFired = 0;
+        
+
         // 非アクティブな弾を探して発射する
         for (int i = 0; i < maxBullets && bulletsFired < numBulletsToFire; ++i)
         {

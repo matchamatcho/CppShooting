@@ -75,7 +75,7 @@ void Obstacle::HandleShooting(ObstacleBullet* obstacleBullets, int maxObstacleBu
     if (m_obstacleFireCooldown <= 0.0f)
     {
         m_obstacleFireCooldown = OBSTACLE_FIRE_COOLDOWN; // クールダウンをリセット
-        //PlaySound(TEXT("assets/shoot.wav"), NULL, SND_FILENAME | SND_ASYNC);
+        
 
        
         float firePosX[] = { -0.1f, 0.0f, 0.1f }; // 左、中央、右の弾のX位置
