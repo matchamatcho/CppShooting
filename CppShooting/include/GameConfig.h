@@ -13,7 +13,7 @@ const float BULLET_HALF_HEIGHT = 0.02f;    // 弾の高さの半分
 const float BULLET_SPEED = 0.05f;           // 弾の飛ぶ速度
 const int MAX_BULLETS = 50;
 const int MAX_OBSTACLE_BULLETS = 2000; // 障害物の弾の最大数
-const float OBSTACLE_FIRE_COOLDOWN = 0.1f;    // 弾の発射クールダウン時間 (値が小さいほど連射速度が上がる)
+const float OBSTACLE_FIRE_COOLDOWN = 3.1f;    // 弾の発射クールダウン時間 (値が小さいほど連射速度が上がる)
 
 // --- 障害物関連 ---
 const float OBSTACLE_SPAWN_INTERVAL = 3.4f; // 障害物が次に出現するまでの時間

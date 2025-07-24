@@ -109,10 +109,18 @@ void Game::UpdateObstacles()
                 m_obstacles[i].Activate(x, y, OBSTACLE_DEFAULT_HP, shape);
                 break; // 1つ出現させたらループを抜ける
             }
-            else {
-				m_obstacles[i].Update(m_obstacleBullets); // 障害物の弾の状態を更新
-            }
+            
         }
+    }
+
+    for (int i = 0; i < MAX_OBSTACLES; ++i)
+    {
+        if (m_obstacles[i].IsActive())
+        {
+			m_obstacles[i].Update(m_obstacleBullets); // 障害物の弾の位置を更新
+           
+        }
+
     }
 }
 
