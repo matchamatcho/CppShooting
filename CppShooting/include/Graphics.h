@@ -76,6 +76,7 @@ private:
 
     void RenderBullets(const Game& game);
     void RenderObstacles(const Game& game);
+	void RenderObstacleBullets(const Game& game);
 
     /**
      * @brief w’è‚³‚ê‚½Œ`ó‚ğ•`‰æ‚µ‚Ü‚·B

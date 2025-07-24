@@ -57,6 +57,7 @@ void Obstacle::Hit()
 
 void Obstacle::Update(ObstacleBullet* obstacleBullets)
 {
+
     // 障害物がアクティブな場合のみ処理を行う
     if (m_isActive)
     {
@@ -67,23 +68,22 @@ void Obstacle::Update(ObstacleBullet* obstacleBullets)
             m_obstacleFireCooldown -= 0.1f;
         }
     }
+
     Obstacle::HandleShooting(obstacleBullets, MAX_OBSTACLE_BULLETS);
 }
 void Obstacle::HandleShooting(ObstacleBullet* obstacleBullets, int maxObstacleBullets)
 {
-    // オートファイアが有効、かつクールダウンが終了していたら弾を発射
+    // クールダウンが終了していたら弾を発射
     if (m_obstacleFireCooldown <= 0.0f)
     {
+		OutputDebugString(L"Obstacle shooting\n"); // デバッグ用の出力
         m_obstacleFireCooldown = OBSTACLE_FIRE_COOLDOWN; // クールダウンをリセット
         
-
-       
-        float firePosX[] = { -0.1f, 0.0f, 0.1f }; // 左、中央、右の弾のX位置
-        float firePosY[] = { 0.06f, 0.1f, 0.06f }; // 左、中央、右の弾のY位置
   
         // 非アクティブな弾を探して発射する
         for (int i = 0; i < maxObstacleBullets ; ++i)
         {
+
             if (!obstacleBullets[i].IsActive())
             {
                 // 形状と位置を指定して弾を有効化

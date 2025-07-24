@@ -29,6 +29,7 @@ public:
     const Player& getPlayer() const { return m_player; }
     const Bullet* getBullets() const { return m_bullets; }
     const Obstacle* getObstacles() const { return m_obstacles; }
+    const ObstacleBullet* getObstacleBullets() const { return m_obstacleBullets; }
     static const int getMaxBullets() { return MAX_BULLETS; }
     static const int getMaxObstacles() { return MAX_OBSTACLES; }
 
