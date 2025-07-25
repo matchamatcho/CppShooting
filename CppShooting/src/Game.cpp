@@ -144,16 +144,11 @@ void Game::CheckCollisions()
                     if (dist_squared < OBSTACLE_COLLISION_RADIUS * OBSTACLE_COLLISION_RADIUS)
                     {
                         m_bullets[i].Deactivate();  // 弾を消す
-                        if (m_bullets[i].GetShape() == m_obstacles[j].GetShape())
-                        {
-                            // 一致すれば追加ダメージ
-                            m_obstacles[j].Hit(SAME_SHAPE_DAMAGE_BONUS);
-                        }
-                        else
-                        {
-                            // 一致しなければ通常ダメージ
-                            m_obstacles[j].Hit(NORMAL_DAMAGE);
-                        }
+                        
+                        // CalculateDamage関数を呼び出してダメージ量を決定
+                        int damage = CalculateDamage(m_bullets[i].GetShape(), m_obstacles[j].GetShape());
+                        m_obstacles[j].Hit(damage);
+                        
                         break; // この弾は消えたので、他の障害物との判定は不要
                     }
                 }
@@ -183,5 +178,31 @@ void Game::CheckObstacleBulletCollisions()
         }
 
 
+    }
+}
+/**
+ * @brief 弾と障害物の形状に基づいて与えるダメージを計算します。
+ * @param bulletShape 弾の形状
+ * @param obstacleShape 障害物の形状
+ * @return 計算されたダメージ量
+ */
+int Game::CalculateDamage(BulletShape bulletShape, BulletShape obstacleShape)
+{
+    // 形状が同じ場合は通常のダメージ
+    if (bulletShape == obstacleShape)
+    {
+        return NORMAL_DAMAGE;
+    }
+
+    // 三角形は正方形に強く、正方形は五角形に強く、五角形は三角形に強い
+    if ((bulletShape == BulletShape::Triangle && obstacleShape == BulletShape::Square) ||
+        (bulletShape == BulletShape::Square && obstacleShape == BulletShape::Pentagon) ||
+        (bulletShape == BulletShape::Pentagon && obstacleShape == BulletShape::Triangle))
+    {
+        return ADVANTAGE_DAMAGE; // 有利な攻撃
+    }
+    else
+    {
+        return DISADVANTAGE_DAMAGE; // 不利な攻撃
     }
 }
