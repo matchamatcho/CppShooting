@@ -68,7 +68,7 @@ void Player::HandleFireToggle()
     if (IsKeyPressedOnce(KEY_TOGGLE_AUTOFIRE, m_wasSpaceKeyPressed))
     {
         m_isAutoFireEnabled = !m_isAutoFireEnabled; // bool’l‚ð”½“]‚³‚¹‚é
-        PlaySound(TEXT("assets/sounds/shoot.wav"), NULL, SND_FILENAME | SND_ASYNC);
+        PlaySound(SOUND_SHOOT, NULL, SND_FILENAME | SND_ASYNC);
     }
 }
 

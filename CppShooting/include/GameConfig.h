@@ -19,8 +19,9 @@ const float BULLET_SPEED = 0.05f;           // 弾の飛ぶ速度
 const int MAX_BULLETS = 50;
 const int MAX_OBSTACLE_BULLETS = 2000; // 障害物の弾の最大数
 const float OBSTACLE_FIRE_COOLDOWN = 3.1f;    // 弾の発射クールダウン時間 (値が小さいほど連射速度が上がる)
-const int SAME_SHAPE_DAMAGE_BONUS = 25;      // 同じ形状の弾が当たった時のダメージ量 (追加)
-const int NORMAL_DAMAGE = 1;                // 通常のダメージ量 (追加)
+const int ADVANTAGE_DAMAGE = 25;     // 有利な形状で攻撃した時のダメージ
+const int NORMAL_DAMAGE = 10;        // 同じ形状で攻撃した時のダメージ
+const int DISADVANTAGE_DAMAGE = 1;   // 不利な形状で攻撃した時のダメージ
 
 // --- 障害物関連 ---
 const float OBSTACLE_SPAWN_INTERVAL = 3.4f; // 障害物が次に出現するまでの時間
@@ -49,6 +50,10 @@ const float GAME_OVER_DELAY = 3.0f;       // ゲームオーバー画面の表示時間
 const float GAME_START_DELAY = 1.0f;      // ゲーム開始前の待機時間
 const float GAME_PAUSE_DELAY = 0.5f;      // ゲーム一時停止の待機時間
 const float GAME_SCORE_UPDATE_INTERVAL = 1.0f; // スコア更新の間隔
+
+// ============== サウンド設定 ================
+const LPCTSTR SOUND_SHOOT = TEXT("assets/sounds/shoot.wav");
+
 
 // ============== キーバインド設定 ================
 // ゲームの操作キーを設定します。
