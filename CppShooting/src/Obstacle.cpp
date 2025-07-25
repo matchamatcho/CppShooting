@@ -42,15 +42,16 @@ void Obstacle::Deactivate()
 /**
  * @brief 弾が当たった時の処理です。
  */
-void Obstacle::Hit()
+void Obstacle::Hit(int damage)
 {
+
     // 障害物がアクティブな場合のみ処理を行う
     if (m_isActive)
     {
-        m_hp--; // HPを1減らす
+        m_hp-=damage; // HPを減らす
         if (m_hp <= 0)
         {
-            Deactivate(); // HPが0以下になったら無効化
+            Obstacle::Deactivate(); // HPが0以下になったら無効化
         }
     }
 }

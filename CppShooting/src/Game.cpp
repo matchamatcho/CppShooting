@@ -144,7 +144,16 @@ void Game::CheckCollisions()
                     if (dist_squared < OBSTACLE_COLLISION_RADIUS * OBSTACLE_COLLISION_RADIUS)
                     {
                         m_bullets[i].Deactivate();  // ’e‚ðÁ‚·
-                        m_obstacles[j].Hit();       // áŠQ•¨‚ÌHP‚ðŒ¸‚ç‚·
+                        if (m_bullets[i].GetShape() == m_obstacles[j].GetShape())
+                        {
+                            // ˆê’v‚·‚ê‚Î’Ç‰Áƒ_ƒ[ƒW
+                            m_obstacles[j].Hit(SAME_SHAPE_DAMAGE_BONUS);
+                        }
+                        else
+                        {
+                            // ˆê’v‚µ‚È‚¯‚ê‚Î’Êíƒ_ƒ[ƒW
+                            m_obstacles[j].Hit(NORMAL_DAMAGE);
+                        }
                         break; // ‚±‚Ì’e‚ÍÁ‚¦‚½‚Ì‚ÅA‘¼‚ÌáŠQ•¨‚Æ‚Ì”»’è‚Í•s—v
                     }
                 }

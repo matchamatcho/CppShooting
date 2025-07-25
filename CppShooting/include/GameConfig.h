@@ -10,6 +10,7 @@ const float PLAYER_MAX_X = 0.82f;           // ƒvƒŒƒCƒ„[‚ÌÅ‘åXÀ•W
 const float PLAYER_MIN_X = -0.82f;          // ƒvƒŒƒCƒ„[‚ÌÅ¬XÀ•W
 const float PLAYER_MAX_Y = 0.82f;           // ƒvƒŒƒCƒ„[‚ÌÅ‘åYÀ•W
 const float PLAYER_MIN_Y = -0.98f;          // ƒvƒŒƒCƒ„[‚ÌÅ¬YÀ•W
+const int PLAYER_DEFAULT_HP = 10;           // ƒvƒŒƒCƒ„[‚Ì‰ŠúHP (’Ç‰Á)
 
 // --- ’eŠÖ˜A ---
 const float BULLET_HALF_WIDTH = 0.005f;     // ’e‚Ì•‚Ì”¼•ª
@@ -18,6 +19,8 @@ const float BULLET_SPEED = 0.05f;           // ’e‚Ì”ò‚Ô‘¬“x
 const int MAX_BULLETS = 50;
 const int MAX_OBSTACLE_BULLETS = 2000; // áŠQ•¨‚Ì’e‚ÌÅ‘å”
 const float OBSTACLE_FIRE_COOLDOWN = 3.1f;    // ’e‚Ì”­ŽËƒN[ƒ‹ƒ_ƒEƒ“ŽžŠÔ (’l‚ª¬‚³‚¢‚Ù‚Ç˜AŽË‘¬“x‚ªã‚ª‚é)
+const int SAME_SHAPE_DAMAGE_BONUS = 25;      // “¯‚¶Œ`ó‚Ì’e‚ª“–‚½‚Á‚½Žž‚Ìƒ_ƒ[ƒW—Ê (’Ç‰Á)
+const int NORMAL_DAMAGE = 1;                // ’Êí‚Ìƒ_ƒ[ƒW—Ê (’Ç‰Á)
 
 // --- áŠQ•¨ŠÖ˜A ---
 const float OBSTACLE_SPAWN_INTERVAL = 3.4f; // áŠQ•¨‚ªŽŸ‚ÉoŒ»‚·‚é‚Ü‚Å‚ÌŽžŠÔ
@@ -25,7 +28,7 @@ const float OBSTACLE_SPAWN_TIMER_DECREMENT = 0.05f; // áŠQ•¨oŒ»ƒ^ƒCƒ}[‚ÌŒ¸­—
 const float OBSTACLE_SPAWN_X_RANGE = 1.54f; // áŠQ•¨‚ÌoŒ»XÀ•W”ÍˆÍ
 const float OBSTACLE_SPAWN_X_OFFSET = 0.77f; // áŠQ•¨‚ÌoŒ»XÀ•WƒIƒtƒZƒbƒg
 const float OBSTACLE_SPAWN_Y_RANGE = 0.75f;  // áŠQ•¨‚ÌoŒ»YÀ•W”ÍˆÍ
-const int   OBSTACLE_DEFAULT_HP = 3;         // áŠQ•¨‚Ì‰ŠúHP
+const int   OBSTACLE_DEFAULT_HP = 50;         // áŠQ•¨‚Ì‰ŠúHP
 const float OBSTACLE_COLLISION_RADIUS = 0.05f; // áŠQ•¨‚Æ‚Ì“–‚½‚è”»’è‚Ì”¼Œa
 const float OBSTACLEBULLET_COLLISION_RADIUS = 0.25f; // ƒvƒŒƒCƒ„[‚Æ‚Ì’e‚Ì“–‚½‚è”»’è‚Ì”¼Œa
 const float OBSTACLE_SCALE = 1.0f;          // áŠQ•¨‚Ì‘å‚«‚³‚Ì”{—¦ (1.0f‚ªŠî€)
