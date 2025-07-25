@@ -39,7 +39,7 @@ public:
     /**
      * @brief 弾が当たった際の処理を行います。HPを減少させ、0以下になったら無効化します。
      */
-    void Hit();
+    void Hit(int damage);
 
     /**
      * @brief 障害物の現在のX座標を返します。
