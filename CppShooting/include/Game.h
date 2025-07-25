@@ -54,4 +54,12 @@ private:
     void CheckCollisions(); // 弾と障害物の当たり判定をチェック
 	void CheckObstacleBulletCollisions(); // 障害物の弾とプレイヤーの当たり判定をチェック
 	void UpdateObstacleBullets(); // 障害物の弾の状態を更新
+
+    /**
+     * @brief 弾と障害物の形状に基づいて与えるダメージを計算します。
+     * @param bulletShape 弾の形状
+     * @param obstacleShape 障害物の形状
+     * @return 計算されたダメージ量
+     */
+    int CalculateDamage(BulletShape bulletShape, BulletShape obstacleShape);
 };
